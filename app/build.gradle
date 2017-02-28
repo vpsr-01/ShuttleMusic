@@ -263,6 +263,7 @@ dependencies {
     compile(libs.materialDialogs) {
         transitive = true;
     }
+    compile libs.expandableRecyclerView
 
     // //////////////////////////////////////////////////////////////////////////
     // Multidex (Only used in non-proguard pre-21 builds)

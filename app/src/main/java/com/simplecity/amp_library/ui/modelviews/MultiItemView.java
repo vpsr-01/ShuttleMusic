@@ -58,6 +58,7 @@ public abstract class MultiItemView<T> extends BaseAdaptableItem<T, MultiItemVie
 
         public TextView lineOne;
         public TextView lineTwo;
+        public TextView lineThree;
         public ImageView imageOne;
         public NonScrollImageButton overflowButton;
         public View bottomContainer;
@@ -67,6 +68,7 @@ public abstract class MultiItemView<T> extends BaseAdaptableItem<T, MultiItemVie
 
             lineOne = (TextView) itemView.findViewById(R.id.line_one);
             lineTwo = (TextView) itemView.findViewById(R.id.line_two);
+            lineThree = (TextView) itemView.findViewById(R.id.line_three);
             imageOne = (ImageView) itemView.findViewById(R.id.image);
             overflowButton = (NonScrollImageButton) itemView.findViewById(R.id.btn_overflow);
             bottomContainer = itemView.findViewById(R.id.bottom_container);

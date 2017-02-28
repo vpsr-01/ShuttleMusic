@@ -68,6 +68,7 @@ import com.simplecity.amp_library.sql.sqlbrite.SqlBriteUtils;
 import com.simplecity.amp_library.tagger.TaggerDialog;
 import com.simplecity.amp_library.ui.fragments.AlbumArtistFragment;
 import com.simplecity.amp_library.ui.fragments.AlbumFragment;
+import com.simplecity.amp_library.ui.fragments.ArtistDetailFragment;
 import com.simplecity.amp_library.ui.fragments.DetailFragment;
 import com.simplecity.amp_library.ui.fragments.DrawerHeaderFragment;
 import com.simplecity.amp_library.ui.fragments.FolderFragment;
@@ -88,6 +89,7 @@ import com.simplecity.amp_library.utils.DataManager;
 import com.simplecity.amp_library.utils.DialogUtils;
 import com.simplecity.amp_library.utils.MusicServiceConnectionUtils;
 import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.utils.NavUtils;
 import com.simplecity.amp_library.utils.PlaylistUtils;
 import com.simplecity.amp_library.utils.ResourceUtils;
 import com.simplecity.amp_library.utils.SettingsManager;
@@ -106,6 +108,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+import static com.simplecity.amp_library.utils.NavUtils.getDetailFragment;
+import static com.simplecity.amp_library.utils.ShuttleUtils.ARG_PLAYLIST;
 
 @SuppressWarnings("ResourceAsColor")
 public class MainActivity extends BaseCastActivity implements
@@ -458,7 +462,7 @@ public class MainActivity extends BaseCastActivity implements
                     }
                     return;
                 case REQUEST_SEARCH:
-                    swapFragments(DetailFragment.newInstance(data.getSerializableExtra(ARG_MODEL)), true);
+                    swapFragments(NavUtils.getDetailFragment(data.getSerializableExtra(ARG_MODEL)), true);
                     return;
                 case TaggerDialog.DOCUMENT_TREE_REQUEST_CODE:
                     if (getSupportFragmentManager().findFragmentByTag(TaggerDialog.TAG) != null) {
@@ -598,7 +602,7 @@ public class MainActivity extends BaseCastActivity implements
             }
         }
 
-        if (getCurrentFragment() instanceof DetailFragment) {
+        if (getCurrentFragment() instanceof DetailFragment || getCurrentFragment() instanceof ArtistDetailFragment) {
             if (sortingItem != null) {
                 sortingItem.setVisible(false);
             }
@@ -630,7 +634,7 @@ public class MainActivity extends BaseCastActivity implements
                                     && com.annimon.stream.Stream.of(albumArtist.albums).anyMatch(album -> album.id == currentAlbum.id))
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(albumArtist -> {
-                                swapFragments(DetailFragment.newInstance(albumArtist), true);
+                                swapFragments(NavUtils.getDetailFragment(albumArtist), true);
                                 new Handler().postDelayed(() ->
                                         mSlidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED, true), time - System.currentTimeMillis() + 250);
                             });
@@ -646,7 +650,7 @@ public class MainActivity extends BaseCastActivity implements
                             .filter(album -> album.id == currentAlbum.id)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(album -> {
-                                swapFragments(DetailFragment.newInstance(album), true);
+                                swapFragments(NavUtils.getDetailFragment(album), true);
                                 new Handler().postDelayed(() ->
                                         mSlidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED, true), time - System.currentTimeMillis() + 250);
                             });
@@ -837,7 +841,7 @@ public class MainActivity extends BaseCastActivity implements
 
         String transitionName = ViewCompat.getTransitionName(transitionView);
 
-        DetailFragment detailFragment = DetailFragment.newInstance(item, transitionName);
+        Fragment detailFragment = getDetailFragment(item, transitionName);
 
         if (ShuttleUtils.hasLollipop()) {
             Transition moveTransition = TransitionInflater.from(this).inflateTransition(R.transition.image_transition);
@@ -883,13 +887,13 @@ public class MainActivity extends BaseCastActivity implements
     @Override
     public void onItemClicked(Genre genre) {
         mTitle = getString(R.string.library_title);
-        swapFragments(DetailFragment.newInstance(genre), true);
+        swapFragments(NavUtils.getDetailFragment(genre), true);
     }
 
     @Override
     public void onItemClicked(Playlist playlist) {
         mTitle = getString(R.string.library_title);
-        swapFragments(DetailFragment.newInstance(playlist), true);
+        swapFragments(NavUtils.getDetailFragment(playlist), true);
     }
 
     @Override
@@ -898,7 +902,7 @@ public class MainActivity extends BaseCastActivity implements
         if (transitionView != null) {
             swapFragments(item, transitionView);
         } else {
-            swapFragments(DetailFragment.newInstance(item), true);
+            swapFragments(NavUtils.getDetailFragment(item), true);
         }
     }
 
@@ -958,7 +962,7 @@ public class MainActivity extends BaseCastActivity implements
     private void handleIntent(Intent intent) {
         boolean handled = false;
         if (MusicService.ShortcutCommands.PLAYLIST.equals(intent.getAction())) {
-            new Handler().postDelayed(() -> swapFragments(DetailFragment.newInstance(intent.getExtras().getSerializable(ShuttleUtils.ARG_PLAYLIST)), true), 50);
+            new Handler().postDelayed(() -> swapFragments(NavUtils.getDetailFragment(intent.getExtras().getSerializable(ARG_PLAYLIST)), true), 50);
             handled = true;
         } else if (MusicService.ShortcutCommands.FOLDERS.equals(intent.getAction())) {
             new Handler().postDelayed(() -> swapFragments(FolderFragment.newInstance(null), true), 50);
@@ -1133,7 +1137,7 @@ public class MainActivity extends BaseCastActivity implements
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void setActionBarAlpha(float alpha, boolean store) {
         Fragment mainFragment = getSupportFragmentManager().findFragmentById(R.id.main_container);
-        if (mainFragment != null && !(mainFragment instanceof DetailFragment)) {
+        if (mainFragment != null && !(mainFragment instanceof DetailFragment) && !(mainFragment instanceof ArtistDetailFragment)) {
             if (alpha > 0f) {
                 alpha = 1f;
             } else {
