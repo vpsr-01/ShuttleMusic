@@ -40,13 +40,8 @@ public class QCircleActivity extends BaseActivity {
     public static final String QUICKCOVERSETTINGS_QUICKCOVER_ENABLE = "quick_view_enable";
     // [END] QuickCover Settings DB
 
-    // QuickCover Type
-    public static final int QUICKCOVERSETTINGS_QUICKCIRCLE = 3;
-
     // [START] QuickCircle info.
     static boolean quickCircleEnabled = false;
-    static int quickCaseType = 0;
-    static boolean quickCircleClosed = true;
     int circleWidth = 0;
     int circleHeight = 0;
     int circleXpos = 0;
@@ -190,9 +185,6 @@ public class QCircleActivity extends BaseActivity {
             Log.d(TAG, "quickCircleEnabled:" + quickCircleEnabled);
         }
 
-        //Get a case type
-        quickCaseType = Settings.Global.getInt(contentResolver, "cover_type", 0/*default value*/);
-
 
         //[START] Get the QuickCircle window information
         int id = getResources().getIdentifier("config_circle_window_width", "dimen",
@@ -273,9 +265,7 @@ public class QCircleActivity extends BaseActivity {
     private void initializeBackButton() {
         backBtn = (ImageButton) findViewById(R.id.back_btn);
         backBtn.setImageDrawable(DrawableUtils.getColoredStateListDrawableWithThemeType(this, R.drawable.backbutton, ThemeUtils.ThemeType.TYPE_DARK));
-        backBtn.setOnClickListener(v -> {
-            QCircleActivity.this.finish();
-        });
+        backBtn.setOnClickListener(v -> QCircleActivity.this.finish());
     }
 
     void updateTrackInfo() {
