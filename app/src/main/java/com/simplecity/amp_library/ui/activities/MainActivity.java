@@ -51,6 +51,7 @@ import com.android.vending.billing.utils.Purchase;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.simplecity.amp_library.BuildConfig;
 import com.simplecity.amp_library.IabManager;
 import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.ShuttleApplication;
@@ -64,13 +65,13 @@ import com.simplecity.amp_library.model.Playlist;
 import com.simplecity.amp_library.model.Query;
 import com.simplecity.amp_library.model.Song;
 import com.simplecity.amp_library.playback.MusicService;
+import com.simplecity.amp_library.search.SearchActivity;
 import com.simplecity.amp_library.sql.sqlbrite.SqlBriteUtils;
 import com.simplecity.amp_library.tagger.TaggerDialog;
 import com.simplecity.amp_library.ui.fragments.AlbumArtistFragment;
 import com.simplecity.amp_library.ui.fragments.AlbumFragment;
 import com.simplecity.amp_library.ui.fragments.ArtistDetailFragment;
 import com.simplecity.amp_library.ui.fragments.DetailFragment;
-import com.simplecity.amp_library.ui.fragments.DrawerHeaderFragment;
 import com.simplecity.amp_library.ui.fragments.FolderFragment;
 import com.simplecity.amp_library.ui.fragments.GenreFragment;
 import com.simplecity.amp_library.ui.fragments.MainFragment;
@@ -367,6 +368,22 @@ public class MainActivity extends BaseCastActivity implements
         themeTaskDescription();
 
         handleIntent(getIntent());
+
+        showChangelogDialog();
+    }
+
+    private void showChangelogDialog() {
+        int storedVersionCode = SettingsManager.getInstance().getStoredVersionCode();
+        // If we've stored a version code in the past, and it's lower than the current version code,
+        // we can show the changelog.
+        // Don't show the changelog for first time users.
+        // Todo: Re-comment this after v1.6.5-beta8 release.
+        if (/*storedVersionCode != -1 &&*/ storedVersionCode < BuildConfig.VERSION_CODE) {
+            if (SettingsManager.getInstance().getShowChangelogOnLaunch()) {
+                DialogUtils.showChangelog(this);
+            }
+            SettingsManager.getInstance().setVersionCode();
+        }
     }
 
     public void setDragView(View dragView, boolean fromExpandedView) {
@@ -432,11 +449,6 @@ public class MainActivity extends BaseCastActivity implements
     public void onResume() {
 
         super.onResume();
-
-        sendBroadcast(new Intent(QueueFragment.UPDATE_QUEUE_FRAGMENT));
-        sendBroadcast(new Intent(MiniPlayerFragment.UPDATE_MINI_PLAYER));
-        sendBroadcast(new Intent(DrawerHeaderFragment.UPDATE_DRAWER_HEADER));
-        sendBroadcast(new Intent(PlayerFragment.UPDATE_PLAYING_FRAGMENT));
 
         DialogUtils.showUpgradeNagDialog(this, (materialDialog, dialogAction) -> {
             if (ShuttleUtils.isAmazonBuild()) {
@@ -732,20 +744,12 @@ public class MainActivity extends BaseCastActivity implements
         super.onServiceConnected(name, obj);
         supportInvalidateOptionsMenu();
 
-        sendBroadcast(new Intent(QueueFragment.UPDATE_QUEUE_FRAGMENT));
-        sendBroadcast(new Intent(MiniPlayerFragment.UPDATE_MINI_PLAYER));
-        sendBroadcast(new Intent(DrawerHeaderFragment.UPDATE_DRAWER_HEADER));
-        sendBroadcast(new Intent(PlayerFragment.UPDATE_PLAYING_FRAGMENT));
-
         if (mIsSlidingEnabled) {
             PlayerFragment playerFragment = (PlayerFragment) getSupportFragmentManager().findFragmentById(R.id.player_container);
 
             if (playerFragment != null) {
 
-                playerFragment.updateTrackInfo();
-                playerFragment.setRepeatButtonImage();
-                playerFragment.setShuffleButtonImage();
-                playerFragment.setPauseButtonImage();
+                playerFragment.update();
 
                 // If the QueuePagerFragment's adapter is empty, it's because it was created before the service
                 // was connected. We need to recreate it now that we know the service is connected.
@@ -760,17 +764,13 @@ public class MainActivity extends BaseCastActivity implements
         }
 
         handlePendingPlaybackRequest();
+
+        togglePanelVisibility(!(MusicServiceConnectionUtils.sServiceBinder == null || MusicUtils.getSongId() == -1));
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
         super.onServiceDisconnected(name);
-        if (mIsSlidingEnabled) {
-            PlayerFragment playerFragment = (PlayerFragment) getSupportFragmentManager().findFragmentById(R.id.player_container);
-            if (playerFragment != null) {
-                playerFragment.setPauseButtonImage();
-            }
-        }
     }
 
     @Override

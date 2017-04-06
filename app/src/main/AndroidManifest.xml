@@ -24,9 +24,12 @@
         android:allowTaskReparenting="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:theme="@style/Theme.Launch">
+
+        <meta-data android:name="android.max_aspect" android:value="2.1" />
 
         <meta-data
             android:name="com.simplecity.amp_library.glide.utils.CustomGlideModule"
@@ -42,7 +45,7 @@
             android:value="com.simplecity.amp_library.SearchActivity" />
         <meta-data
             android:name="com.crashlytics.ApiKey"
-            android:value="94f7dbcd9c73c47e45d1ded9c8fc38d4d0ddebb4" />
+            android:value="${CRASHLYTICS_API_KEY}" />
 
         <activity
             android:name=".ui.activities.MainActivity"
@@ -136,7 +139,7 @@
         <activity android:name=".ui.activities.SettingsActivity" />
         <activity android:name=".ui.activities.EqualizerActivity" />
         <activity
-            android:name=".ui.activities.SearchActivity"
+            android:name=".search.SearchActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />

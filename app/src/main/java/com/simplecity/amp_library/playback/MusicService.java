@@ -106,12 +106,12 @@ public class MusicService extends Service {
 
     private static final int NOTIFICATION_ID = 150;
 
-    public interface ShuffleMode {
+    public @interface ShuffleMode {
         int OFF = 0;
         int ON = 1;
     }
 
-    public interface RepeatMode {
+    public @interface RepeatMode {
         int OFF = 0;
         int ONE = 1;
         int ALL = 2;
@@ -134,6 +134,7 @@ public class MusicService extends Service {
         String SHUFFLE_CHANGED = INTERNAL_INTENT_PREFIX + ".shufflechanged";
         String REPEAT_CHANGED = INTERNAL_INTENT_PREFIX + ".repeatchanged";
         String FAVORITE_CHANGED = INTERNAL_INTENT_PREFIX + ".favoritechanged";
+        String SERVICE_CONNECTED = INTERNAL_INTENT_PREFIX + ".serviceconnected";
     }
 
     public interface MediaButtonCommand {
@@ -1859,11 +1860,14 @@ public class MusicService extends Service {
                 ? PlaybackStateCompat.STATE_PLAYING
                 : PlaybackStateCompat.STATE_PAUSED;
 
+        long playbackActions = getMediaSessionActions();
+
         if (what.equals(InternalIntents.PLAY_STATE_CHANGED) || what.equals(InternalIntents.POSITION_CHANGED)) {
             //noinspection WrongConstant
             mSession.setPlaybackState(new PlaybackStateCompat.Builder()
-                    .setActions(getMediaSessionActions())
-                    .setState(playState, getPosition(), 1.0f).build());
+                    .setActions(playbackActions)
+                    .setState(playState, getPosition(), 1.0f)
+                    .build());
         } else if (what.equals(InternalIntents.META_CHANGED) || what.equals(InternalIntents.QUEUE_CHANGED)) {
 
             MediaMetadataCompat.Builder metaData = new MediaMetadataCompat.Builder()
@@ -1878,10 +1882,9 @@ public class MusicService extends Service {
                     .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, null);
 
             // MetadataEditor does not support NUM_TRACKS at all, so we don't attempt to set it on <API21 devices
-            if(ShuttleUtils.hasLollipop()) {
+            if (ShuttleUtils.hasLollipop()) {
                 metaData.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, (long) (getQueue().size()));
             }
-
 
             if (SettingsManager.getInstance().showLockscreenArtwork()) {
                 //Glide has to be called from the main thread.
@@ -1912,6 +1915,11 @@ public class MusicService extends Service {
             } else {
                 mSession.setMetadata(metaData.build());
             }
+
+            mSession.setPlaybackState(new PlaybackStateCompat.Builder()
+                    .setActions(playbackActions)
+                    .setState(playState, getPosition(), 1.0f)
+                    .build());
         }
     }
 
@@ -1978,7 +1986,7 @@ public class MusicService extends Service {
             mNotification = builder.build();
         }
 
-        boolean invertIconsAndText = SettingsManager.getInstance().invertNotificationIcons();
+        boolean invertIconsAndText = SettingsManager.getInstance().invertNotificationIcons() && ShuttleUtils.hasLollipop();
 
         int baseLayoutResId = invertIconsAndText ? R.layout.notification_template_base_inverse : R.layout.notification_template_base;
         int baseBigLayoutResId = invertIconsAndText ? R.layout.notification_template_big_base_inverse : R.layout.notification_template_big_base;
@@ -2039,11 +2047,15 @@ public class MusicService extends Service {
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        if (resource != null) {
-                            contentView.setImageViewBitmap(R.id.icon, resource);
-                            bigContentView.setImageViewBitmap(R.id.icon, resource);
+                        try {
+                            if (resource != null) {
+                                contentView.setImageViewBitmap(R.id.icon, resource);
+                                bigContentView.setImageViewBitmap(R.id.icon, resource);
+                            }
+                            mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+                        } catch (NullPointerException e) {
+                            Log.e(TAG, "Exception while attempting to update notification with glide image: " + e);
                         }
-                        mNotificationManager.notify(NOTIFICATION_ID, mNotification);
                     }
 
                     @Override

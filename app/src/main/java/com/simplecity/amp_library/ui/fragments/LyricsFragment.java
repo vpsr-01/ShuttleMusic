@@ -1,5 +1,6 @@
 package com.simplecity.amp_library.ui.fragments;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -41,6 +42,7 @@ public class LyricsFragment extends BaseFragment {
 
     private String mLyrics;
     private TextView mLyricsTextView;
+    private Button mQuickLyricButton;
 
     /**
      * Empty constructor as per the {@link android.app.Fragment} docs
@@ -54,22 +56,10 @@ public class LyricsFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_lyrics, container, false);
         rootView.setBackgroundColor(Color.parseColor("#C8000000"));
         mLyricsTextView = (TextView) rootView.findViewById(R.id.text1);
+        mQuickLyricButton = (Button) rootView.findViewById(R.id.btn_quick_lyric);
 
         final GestureDetector gestureDetector = new GestureDetector(this.getActivity(), new GestureListener());
         mLyricsTextView.setOnTouchListener((view, motionEvent) -> gestureDetector.onTouchEvent(motionEvent));
-
-
-        Button quickLyricButton = (Button) rootView.findViewById(R.id.btn_quick_lyric);
-        quickLyricButton.setOnClickListener(v -> {
-            if (isQuickLyricInstalled()) {
-                Intent intent = new Intent("com.geecko.QuickLyric.getLyrics");
-                intent.putExtra("TAGS", new String[]{MusicUtils.getAlbumArtistName(), MusicUtils.getSongName()});
-                startActivity(intent);
-            }
-        });
-        if (isQuickLyricInstalled()) {
-            quickLyricButton.setVisibility(View.VISIBLE);
-        }
 
         ScrollView scrollView = (ScrollView) rootView.findViewById(R.id.scrollView);
         ThemeUtils.themeScrollView(scrollView);
@@ -83,6 +73,7 @@ public class LyricsFragment extends BaseFragment {
 
         mLyrics = getLyrics();
         mLyricsTextView.setText(mLyrics);
+        showQuickLyricButton(getString(R.string.no_lyrics).equals(mLyrics));
     }
 
     public String getLyrics() {
@@ -101,13 +92,17 @@ public class LyricsFragment extends BaseFragment {
                         .uri(Uri.parse(path))
                         .projection(new String[]{MediaStore.Audio.Media.DATA})
                         .build();
+
                 Cursor cursor = SqlUtils.createQuery(getContext(), query);
                 if (cursor != null) {
-                    int colIndex = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
-                    if (cursor.moveToFirst()) {
-                        filePath = cursor.getString(colIndex);
+                    try {
+                        int colIndex = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
+                        if (cursor.moveToFirst()) {
+                            filePath = cursor.getString(colIndex);
+                        }
+                    } finally {
+                        cursor.close();
                     }
-                    cursor.close();
                 }
             }
         }
@@ -133,13 +128,41 @@ public class LyricsFragment extends BaseFragment {
     }
 
     public void updateLyrics() {
-
         mLyrics = getLyrics();
         if (mLyricsTextView != null) {
             mLyricsTextView.setText(mLyrics);
         }
+        showQuickLyricButton(getString(R.string.no_lyrics).equals(mLyrics));
     }
 
+    private void showQuickLyricButton(boolean visible) {
+        if (visible) {
+            // If there are no embedded lyrics, the QuickLyric button is shown
+            mQuickLyricButton.setVisibility(View.VISIBLE);
+            if (isQuickLyricInstalled()) {
+                mQuickLyricButton.setText(R.string.quicklyric);
+                mQuickLyricButton.setOnClickListener(v -> {
+                    if (isQuickLyricInstalled()) {
+                        Intent intent = new Intent("com.geecko.QuickLyric.getLyrics");
+                        intent.putExtra("TAGS", new String[]{MusicUtils.getAlbumArtistName(), MusicUtils.getSongName()});
+                        startActivity(intent);
+                    }
+                });
+            } else {
+                mQuickLyricButton.setText(R.string.quicklyric_play_store);
+                mQuickLyricButton.setOnClickListener(v -> {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://d3khd.app.goo.gl/jdF1"));
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException ignored) {
+                        // If the user doesn't have the play store on their device
+                    }
+                });
+            }
+        } else {
+            mQuickLyricButton.setVisibility(View.GONE);
+        }
+    }
 
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         GestureListener() {
