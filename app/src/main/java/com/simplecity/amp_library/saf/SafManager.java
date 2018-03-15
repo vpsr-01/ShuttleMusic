@@ -22,7 +22,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
 import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.ShuttleApplication;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -164,7 +164,7 @@ public class SafManager {
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Nullable
     public String getDocumentTree() {
-        String treeUri = SettingsManager.getInstance().getDocumentTreeUri();
+        String treeUri = UISettings.getInstance().getDocumentTreeUri();
         List<UriPermission> perms = ShuttleApplication.getInstance().getContentResolver().getPersistedUriPermissions();
         for (UriPermission perm : perms) {
             if (perm.getUri().toString().equals(treeUri) && perm.isWritePermission())
@@ -296,7 +296,7 @@ public class SafManager {
                         Uri treeUri = data.getData();
                         if (treeUri != null) {
                             ShuttleApplication.getInstance().getContentResolver().takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                            SettingsManager.getInstance().setDocumentTreeUri(data.getData().toString());
+                            UISettings.getInstance().setDocumentTreeUri(data.getData().toString());
                             if (listener != null) {
                                 listener.onResult(treeUri);
                             }

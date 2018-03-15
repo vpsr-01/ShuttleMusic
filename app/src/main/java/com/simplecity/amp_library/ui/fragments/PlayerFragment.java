@@ -30,6 +30,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.f2prateek.rx.preferences2.RxSharedPreferences;
+import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.jakewharton.rxbinding2.widget.RxSeekBar;
 import com.jakewharton.rxbinding2.widget.SeekBarChangeEvent;
 import com.jakewharton.rxbinding2.widget.SeekBarProgressChangeEvent;
@@ -41,10 +42,10 @@ import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.dagger.module.FragmentModule;
 import com.simplecity.amp_library.glide.palette.PaletteBitmap;
 import com.simplecity.amp_library.glide.palette.PaletteBitmapTranscoder;
-import com.simplecity.amp_library.model.AlbumArtist;
 import com.simplecity.amp_library.model.Genre;
 import com.simplecity.amp_library.model.Song;
-import com.simplecity.amp_library.playback.MusicService;
+import com.simplecity.amp_library.playback.MusicUtils;
+import com.simplecity.amp_library.playback.QueueManager;
 import com.simplecity.amp_library.rx.UnsafeConsumer;
 import com.simplecity.amp_library.tagger.TaggerDialog;
 import com.simplecity.amp_library.ui.drawer.NavigationEventRelay;
@@ -60,11 +61,10 @@ import com.simplecity.amp_library.ui.views.SnowfallView;
 import com.simplecity.amp_library.ui.views.multisheet.MultiSheetSlideEventRelay;
 import com.simplecity.amp_library.utils.DataManager;
 import com.simplecity.amp_library.utils.LogUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
 import com.simplecity.amp_library.utils.PlaceholderProvider;
-import com.simplecity.amp_library.utils.SettingsManager;
 import com.simplecity.amp_library.utils.ShuttleUtils;
 import com.simplecity.amp_library.utils.StringUtils;
+import com.simplecity.amp_library.utils.UISettings;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
@@ -75,6 +75,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -157,12 +158,15 @@ public class PlayerFragment extends BaseFragment implements
 
     int currentColor = Color.TRANSPARENT;
 
-    @Nullable
-    private Target<GlideDrawable> target;
-
     private boolean isLandscape;
 
     private boolean isExpanded;
+
+    @Nullable
+    private Target<GlideDrawable> target;
+
+    @Nullable
+    private SimpleTarget<PaletteBitmap> paletteTarget;
 
     public PlayerFragment() {
     }
@@ -194,7 +198,8 @@ public class PlayerFragment extends BaseFragment implements
 
         toolbar.setNavigationOnClickListener(v -> getActivity().onBackPressed());
         toolbar.inflateMenu(R.menu.menu_now_playing);
-        setupCastMenu(toolbar.getMenu());
+
+        CastButtonFactory.setUpMediaRouteButton(getContext().getApplicationContext(), toolbar.getMenu(), R.id.media_route_menu_item);
 
         MenuItem favoriteMenuItem = toolbar.getMenu().findItem(R.id.favorite);
         FavoriteActionBarView menuActionView = (FavoriteActionBarView) favoriteMenuItem.getActionView();
@@ -250,15 +255,22 @@ public class PlayerFragment extends BaseFragment implements
         if (target != null) {
             Glide.clear(target);
         }
+
+        if (paletteTarget != null) {
+            Glide.clear(paletteTarget);
+        }
+
         snowfallView.clear();
+
         presenter.unbindView(this);
         unbinder.unbind();
+
         super.onDestroyView();
     }
 
     public void update() {
         if (presenter != null) {
-            presenter.updateTrackInfo();
+            presenter.updateTrackInfo(MusicUtils.getCurrentSong());
         }
     }
 
@@ -294,7 +306,7 @@ public class PlayerFragment extends BaseFragment implements
         }
 
         disposables.add(RxSharedPreferences.create(PreferenceManager.getDefaultSharedPreferences(getContext()))
-                .getBoolean(SettingsManager.KEY_DISPLAY_REMAINING_TIME)
+                .getBoolean(UISettings.KEY_DISPLAY_REMAINING_TIME)
                 .asObservable()
                 .subscribe(aBoolean -> presenter.updateRemainingTime()));
 
@@ -382,14 +394,14 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     @Override
-    public void shuffleChanged(@MusicService.ShuffleMode int shuffleMode) {
+    public void shuffleChanged(@QueueManager.ShuffleMode String shuffleMode) {
         if (shuffleButton != null) {
             shuffleButton.setShuffleMode(shuffleMode);
         }
     }
 
     @Override
-    public void repeatChanged(@MusicService.RepeatMode int repeatMode) {
+    public void repeatChanged(@QueueManager.RepeatMode String repeatMode) {
         if (repeatButton != null) {
             repeatButton.setRepeatMode(repeatMode);
         }
@@ -452,66 +464,77 @@ public class PlayerFragment extends BaseFragment implements
             toolbar.setSubtitle(null);
         }
 
-        if (SettingsManager.getInstance().getUsePalette()) {
+        if (UISettings.getInstance().getUsePalette()) {
             //noinspection unchecked
-            Glide.with(this)
-                    .load(song)
-                    .asBitmap()
-                    .transcode(new PaletteBitmapTranscoder(getContext()), PaletteBitmap.class)
-                    .override(250, 250)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(new SimpleTarget<PaletteBitmap>() {
-                        @Override
-                        public void onResourceReady(PaletteBitmap resource, GlideAnimation<? super PaletteBitmap> glideAnimation) {
 
-                            if (!isAdded() || getContext() == null) {
-                                return;
-                            }
+            if (paletteTarget != null) {
+                Glide.clear(paletteTarget);
+            }
+            disposables.add(Completable.timer(250, TimeUnit.MILLISECONDS)
+                    .andThen(Completable.fromAction(() -> {
+                                paletteTarget = new SimpleTarget<PaletteBitmap>() {
+                                    @Override
+                                    public void onResourceReady(PaletteBitmap resource, GlideAnimation<? super PaletteBitmap> glideAnimation) {
 
-                            Palette.Swatch swatch = resource.palette.getDarkMutedSwatch();
-                            if (swatch != null) {
-                                if (SettingsManager.getInstance().getUsePalette()) {
-                                    if (SettingsManager.getInstance().getUsePaletteNowPlayingOnly()) {
-                                        animateColors(currentColor, swatch.getRgb(), color -> invalidateColors(color));
-                                    } else {
-                                        // Set Aesthetic colors globally, based on the current Palette swatch
-                                        disposables.add(
-                                                Aesthetic.get(getContext())
-                                                        .colorPrimary()
-                                                        .take(1)
-                                                        .subscribe(integer -> animateColors(integer, swatch.getRgb(), color -> {
-                                                            if (getContext() != null && isAdded()) {
-                                                                Aesthetic aesthetic = Aesthetic.get(getContext())
-                                                                        .colorPrimary(color)
-                                                                        .colorStatusBarAuto();
+                                        if (!isAdded() || getContext() == null) {
+                                            return;
+                                        }
 
-                                                                if (SettingsManager.getInstance().getTintNavBar()) {
-                                                                    aesthetic = aesthetic.colorNavigationBar(color);
-                                                                }
+                                        Palette.Swatch swatch = resource.palette.getDarkMutedSwatch();
+                                        if (swatch != null) {
+                                            if (UISettings.getInstance().getUsePalette()) {
+                                                if (UISettings.getInstance().getUsePaletteNowPlayingOnly()) {
+                                                    animateColors(currentColor, swatch.getRgb(), color -> invalidateColors(color));
+                                                } else {
+                                                    // Set Aesthetic colors globally, based on the current Palette swatch
+                                                    disposables.add(
+                                                            Aesthetic.get(getContext())
+                                                                    .colorPrimary()
+                                                                    .take(1)
+                                                                    .subscribe(integer -> animateColors(integer, swatch.getRgb(), color -> {
+                                                                        if (getContext() != null && isAdded()) {
+                                                                            Aesthetic aesthetic = Aesthetic.get(getContext())
+                                                                                    .colorPrimary(color)
+                                                                                    .colorStatusBarAuto();
 
-                                                                aesthetic.apply();
-                                                            }
-                                                        })));
+                                                                            if (UISettings.getInstance().getTintNavBar()) {
+                                                                                aesthetic = aesthetic.colorNavigationBar(color);
+                                                                            }
+
+                                                                            aesthetic.apply();
+                                                                        }
+                                                                    })));
+                                                }
+                                            }
+                                        } else {
+                                            // Failed to generate the dark muted swatch, fall back to the primary theme colour.
+                                            Aesthetic.get(getContext())
+                                                    .colorPrimary()
+                                                    .take(1)
+                                                    .subscribe(primaryColor -> animateColors(currentColor, primaryColor, PlayerFragment.this::invalidateColors));
+                                        }
                                     }
-                                }
-                            } else {
-                                // Failed to generate the dark muted swatch, fall back to the primary theme colour.
-                                Aesthetic.get(getContext())
-                                        .colorPrimary()
-                                        .take(1)
-                                        .subscribe(primaryColor -> animateColors(currentColor, primaryColor, color -> invalidateColors(color)));
-                            }
-                        }
 
-                        @Override
-                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                            super.onLoadFailed(e, errorDrawable);
-                            Aesthetic.get(getContext())
-                                    .colorPrimary()
-                                    .take(1)
-                                    .subscribe(primaryColor -> animateColors(currentColor, primaryColor, color -> invalidateColors(color)));
-                        }
-                    });
+                                    @Override
+                                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                                        super.onLoadFailed(e, errorDrawable);
+                                        Aesthetic.get(getContext())
+                                                .colorPrimary()
+                                                .take(1)
+                                                .subscribe(primaryColor -> animateColors(currentColor, primaryColor, color -> invalidateColors(color)));
+                                    }
+                                };
+                                Glide.with(PlayerFragment.this)
+                                        .load(song)
+                                        .asBitmap()
+                                        .transcode(new PaletteBitmapTranscoder(getContext()), PaletteBitmap.class)
+                                        .override(250, 250)
+                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .into(paletteTarget);
+                            }).subscribeOn(AndroidSchedulers.mainThread())
+                    )
+                    .onErrorComplete()
+                    .subscribe());
         }
     }
 
@@ -603,30 +626,38 @@ public class PlayerFragment extends BaseFragment implements
 
     @SuppressLint("CheckResult")
     private void goToArtist() {
-        AlbumArtist currentAlbumArtist = MusicUtils.getAlbumArtist();
-        // MusicUtils.getAlbumArtist() is only populate with the album the current Song belongs to.
-        // Let's find the matching AlbumArtist in the DataManager.albumArtistRelay
-        DataManager.getInstance().getAlbumArtistsRelay()
-                .first(Collections.emptyList())
-                .flatMapObservable(Observable::fromIterable)
-                .filter(albumArtist -> currentAlbumArtist != null && albumArtist.name.equals(currentAlbumArtist.name) && albumArtist.albums.containsAll(currentAlbumArtist.albums))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(albumArtist -> navigationEventRelay.sendEvent(new NavigationEventRelay.NavigationEvent(NavigationEventRelay.NavigationEvent.Type.GO_TO_ARTIST, albumArtist, true)));
+        Song currentSong = MusicUtils.getCurrentSong();
+        if (currentSong != null) {
+            // song.getAlbumArtist() is only populated with the album the current Song belongs to.
+            // Let's find the matching AlbumArtist in the DataManager.albumArtistRelay
+            DataManager.getInstance().getAlbumArtistsRelay()
+                    .first(Collections.emptyList())
+                    .flatMapObservable(Observable::fromIterable)
+                    .filter(albumArtist -> currentSong.getAlbumArtist() != null && albumArtist.name.equals(currentSong.getAlbumArtist().name) && albumArtist.albums.containsAll(song.getAlbumArtist().albums))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(albumArtist -> navigationEventRelay.sendEvent(new NavigationEventRelay.NavigationEvent(NavigationEventRelay.NavigationEvent.Type.GO_TO_ARTIST, albumArtist, true)));
+        }
     }
 
     private void goToAlbum() {
-        navigationEventRelay.sendEvent(new NavigationEventRelay.NavigationEvent(NavigationEventRelay.NavigationEvent.Type.GO_TO_ALBUM, MusicUtils.getAlbum(), true));
+        Song song = MusicUtils.getCurrentSong();
+        if (song != null) {
+            navigationEventRelay.sendEvent(new NavigationEventRelay.NavigationEvent(NavigationEventRelay.NavigationEvent.Type.GO_TO_ALBUM, song.getAlbum(), true));
+        }
     }
 
     @SuppressLint("CheckResult")
     private void goToGenre() {
-        MusicUtils.getGenre()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        (UnsafeConsumer<Genre>) genre -> navigationEventRelay.sendEvent(new NavigationEventRelay.NavigationEvent(NavigationEventRelay.NavigationEvent.Type.GO_TO_GENRE, genre, true)),
-                        error -> LogUtils.logException(TAG, "Error retrieving genre", error));
+        Song currentSong = MusicUtils.getCurrentSong();
+        if (currentSong != null) {
+            currentSong.getGenre()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            (UnsafeConsumer<Genre>) genre -> navigationEventRelay.sendEvent(new NavigationEventRelay.NavigationEvent(NavigationEventRelay.NavigationEvent.Type.GO_TO_GENRE, genre, true)),
+                            error -> LogUtils.logException(TAG, "Error retrieving genre", error));
+        }
     }
 
     void animateColors(int from, int to, UnsafeConsumer<Integer> consumer) {

@@ -32,7 +32,7 @@ import com.simplecity.amp_library.model.Song;
 import com.simplecity.amp_library.utils.CustomMediaScanner;
 import com.simplecity.amp_library.utils.DialogUtils;
 import com.simplecity.amp_library.utils.LogUtils;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -366,19 +366,15 @@ public class TaggerDialog extends DialogFragment {
                 TaggerTask.TagCompletionListener listener = new TaggerTask.TagCompletionListener() {
                     @Override
                     public void onSuccess() {
-
                         CustomMediaScanner.scanFiles(originalSongPaths, null);
-
                         if (getContext() != null && isResumed()) {
                             saveProgressDialog.dismiss();
-
                             dismiss();
                         }
                     }
 
                     @Override
                     public void onFailure() {
-
                         if (getContext() != null && isResumed()) {
                             saveProgressDialog.dismiss();
                             Toast.makeText(getContext(), R.string.tag_error, Toast.LENGTH_LONG).show();
@@ -435,7 +431,7 @@ public class TaggerDialog extends DialogFragment {
                 if (resultCode == Activity.RESULT_OK) {
                     Uri treeUri = data.getData();
                     ShuttleApplication.getInstance().getContentResolver().takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    SettingsManager.getInstance().setDocumentTreeUri(data.getData().toString());
+                    UISettings.getInstance().setDocumentTreeUri(data.getData().toString());
                     saveTags();
                 }
                 break;

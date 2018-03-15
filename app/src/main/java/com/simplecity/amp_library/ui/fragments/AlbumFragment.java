@@ -22,7 +22,7 @@ import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.dagger.module.FragmentModule;
 import com.simplecity.amp_library.model.Album;
-import com.simplecity.amp_library.playback.MusicService;
+import com.simplecity.amp_library.playback.QueueManager;
 import com.simplecity.amp_library.ui.adapters.SectionedAdapter;
 import com.simplecity.amp_library.ui.adapters.ViewType;
 import com.simplecity.amp_library.ui.dialog.UpgradeDialog;
@@ -36,11 +36,11 @@ import com.simplecity.amp_library.utils.ContextualToolbarHelper;
 import com.simplecity.amp_library.utils.DataManager;
 import com.simplecity.amp_library.utils.LogUtils;
 import com.simplecity.amp_library.utils.MenuUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.utils.Operators;
 import com.simplecity.amp_library.utils.PermissionUtils;
 import com.simplecity.amp_library.utils.PlaylistUtils;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecity.amp_library.utils.SortManager;
 import com.simplecityapps.recycler_adapter.model.ViewModel;
 import com.simplecityapps.recycler_adapter.recyclerview.RecyclerListener;
@@ -57,7 +57,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 
 public class AlbumFragment extends BaseFragment implements
-        MusicUtils.Defs,
         AlbumView.ClickListener,
         ShuffleView.ShuffleClickListener {
 
@@ -138,7 +137,7 @@ public class AlbumFragment extends BaseFragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         if (recyclerView == null) {
-            int spanCount = SettingsManager.getInstance().getAlbumColumnCount(getResources());
+            int spanCount = UISettings.getInstance().getAlbumColumnCount(getResources());
             layoutManager = new GridLayoutManager(getContext(), spanCount);
             spanSizeLookup = new SpanSizeLookup(adapter, spanCount);
             spanSizeLookup.setSpanIndexCacheEnabled(true);
@@ -189,7 +188,7 @@ public class AlbumFragment extends BaseFragment implements
         PermissionUtils.RequestStoragePermissions(() -> {
             if (getActivity() != null && isAdded()) {
 
-                int albumDisplayType = SettingsManager.getInstance().getAlbumDisplayType();
+                int albumDisplayType = UISettings.getInstance().getAlbumDisplayType();
 
                 boolean ascending = SortManager.getInstance().getAlbumsAscending();
 
@@ -282,7 +281,7 @@ public class AlbumFragment extends BaseFragment implements
 
         menu.findItem(R.id.sort_ascending).setChecked(SortManager.getInstance().getAlbumsAscending());
 
-        int displayType = SettingsManager.getInstance().getAlbumDisplayType();
+        int displayType = UISettings.getInstance().getAlbumDisplayType();
         switch (displayType) {
             case ViewType.ALBUM_LIST:
                 menu.findItem(R.id.view_as_list).setChecked(true);
@@ -305,7 +304,7 @@ public class AlbumFragment extends BaseFragment implements
             gridMenuItem.setVisible(true);
             SubMenu subMenu = gridMenuItem.getSubMenu();
             if (subMenu != null) {
-                subMenu.findItem(SettingsManager.getInstance().getAlbumColumnCount(getResources()))
+                subMenu.findItem(UISettings.getInstance().getAlbumColumnCount(getResources()))
                         .setChecked(true);
             }
         }
@@ -342,34 +341,34 @@ public class AlbumFragment extends BaseFragment implements
                 break;
             case R.id.view_as_list:
                 int viewType = ViewType.ALBUM_LIST;
-                SettingsManager.getInstance().setAlbumDisplayType(viewType);
+                UISettings.getInstance().setAlbumDisplayType(viewType);
                 setupListSpan();
                 updateViewType(viewType);
                 break;
             case R.id.view_as_grid:
                 viewType = ViewType.ALBUM_GRID;
-                SettingsManager.getInstance().setAlbumDisplayType(viewType);
+                UISettings.getInstance().setAlbumDisplayType(viewType);
                 setupGridSpan();
                 updateViewType(viewType);
                 break;
             case R.id.view_as_grid_card:
                 viewType = ViewType.ALBUM_CARD;
-                SettingsManager.getInstance().setAlbumDisplayType(viewType);
+                UISettings.getInstance().setAlbumDisplayType(viewType);
                 setupGridSpan();
                 updateViewType(viewType);
                 break;
             case R.id.view_as_grid_palette:
                 viewType = ViewType.ALBUM_PALETTE;
-                SettingsManager.getInstance().setAlbumDisplayType(viewType);
+                UISettings.getInstance().setAlbumDisplayType(viewType);
                 setupGridSpan();
                 updateViewType(viewType);
                 break;
         }
 
         if (item.getGroupId() == MENU_GROUP_GRID) {
-            SettingsManager.getInstance().setAlbumColumnCount(item.getItemId());
+            UISettings.getInstance().setAlbumColumnCount(item.getItemId());
             spanSizeLookup.setSpanCount(item.getItemId());
-            ((GridLayoutManager) recyclerView.getLayoutManager()).setSpanCount(SettingsManager.getInstance().getAlbumColumnCount(getResources()));
+            ((GridLayoutManager) recyclerView.getLayoutManager()).setSpanCount(UISettings.getInstance().getAlbumColumnCount(getResources()));
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }
 
@@ -379,7 +378,7 @@ public class AlbumFragment extends BaseFragment implements
     }
 
     private void setupGridSpan() {
-        int spanCount = SettingsManager.getInstance().getAlbumColumnCount(getResources());
+        int spanCount = UISettings.getInstance().getAlbumColumnCount(getResources());
         spanSizeLookup.setSpanCount(spanCount);
         layoutManager.setSpanCount(spanCount);
     }
@@ -431,7 +430,7 @@ public class AlbumFragment extends BaseFragment implements
     @Override
     public void onShuffleItemClick() {
         // Note: For album-shuffle mode, we don't actually turn shuffle on.
-        MusicUtils.setShuffleMode(MusicService.ShuffleMode.OFF);
+        MusicUtils.setShuffleMode(QueueManager.ShuffleMode.OFF);
         MusicUtils.playAll(DataManager.getInstance()
                         .getSongsRelay()
                         .firstOrError()

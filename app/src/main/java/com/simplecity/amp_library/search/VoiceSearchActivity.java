@@ -15,7 +15,7 @@ import com.simplecity.amp_library.ui.activities.MainActivity;
 import com.simplecity.amp_library.utils.ComparisonUtils;
 import com.simplecity.amp_library.utils.DataManager;
 import com.simplecity.amp_library.utils.LogUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.playback.MusicUtils;
 
 import java.util.Collections;
 import java.util.Locale;

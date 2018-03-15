@@ -87,11 +87,11 @@ public class FileBrowser {
         sortFileObjects(fileObjects);
         sortFolderObjects(folderObjects);
 
-        if (!SettingsManager.getInstance().getFolderBrowserFilesAscending()) {
+        if (!UISettings.getInstance().getFolderBrowserFilesAscending()) {
             Collections.reverse(fileObjects);
         }
 
-        if (!SettingsManager.getInstance().getFolderBrowserFoldersAscending()) {
+        if (!UISettings.getInstance().getFolderBrowserFoldersAscending()) {
             Collections.reverse(folderObjects);
         }
 
@@ -120,7 +120,7 @@ public class FileBrowser {
         File dir;
         String[] files;
 
-        String settingsDir = SettingsManager.getInstance().getFolderBrowserInitialDir();
+        String settingsDir = UISettings.getInstance().getFolderBrowserInitialDir();
         if (settingsDir != null) {
             File file = new File(settingsDir);
             if (file.exists()) {
@@ -164,7 +164,7 @@ public class FileBrowser {
 
     public void sortFolderObjects(List<BaseFileObject> baseFileObjects) {
 
-        switch (SettingsManager.getInstance().getFolderBrowserFoldersSortOrder()) {
+        switch (UISettings.getInstance().getFolderBrowserFoldersSortOrder()) {
             case SortManager.SortFolders.COUNT:
                 Collections.sort(baseFileObjects, fileCountComparator());
                 Collections.sort(baseFileObjects, folderCountComparator());
@@ -178,7 +178,7 @@ public class FileBrowser {
     }
 
     public void sortFileObjects(List<BaseFileObject> baseFileObjects) {
-        switch (SettingsManager.getInstance().getFolderBrowserFilesSortOrder()) {
+        switch (UISettings.getInstance().getFolderBrowserFilesSortOrder()) {
             case SortManager.SortFiles.SIZE:
                 Collections.sort(baseFileObjects, sizeComparator());
                 break;
@@ -204,15 +204,15 @@ public class FileBrowser {
     }
 
     public void clearHomeDir() {
-        SettingsManager.getInstance().setFolderBrowserInitialDir("");
+        UISettings.getInstance().setFolderBrowserInitialDir("");
     }
 
     public void setHomeDir() {
-        SettingsManager.getInstance().setFolderBrowserInitialDir(currentDir.getPath());
+        UISettings.getInstance().setFolderBrowserInitialDir(currentDir.getPath());
     }
 
     public File getHomeDir() {
-        return new File(SettingsManager.getInstance().getFolderBrowserInitialDir());
+        return new File(UISettings.getInstance().getFolderBrowserInitialDir());
     }
 
     public boolean hasHomeDir() {

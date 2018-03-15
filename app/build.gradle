@@ -222,7 +222,9 @@ dependencies {
     implementation Dependencies.Google.firebaseCore
     implementation Dependencies.Google.firebaseRemoteConfig
     implementation Dependencies.Google.constraintLayout
-    implementation Dependencies.Google.chromecast
+//    implementation Dependencies.Google.chromecast
+    implementation Dependencies.Google.castFramework
+    implementation Dependencies.Google.exoPlayer
 
     // Square libs
     implementation Dependencies.Square.okio
@@ -238,7 +240,6 @@ dependencies {
     implementation project(Dependencies.Projects.navigation)
     implementation project(Dependencies.Projects.recyclerAdapter)
     implementation project(Dependencies.Projects.multiSheetView)
-    implementation project(Dependencies.Projects.ccl)
     implementation project(Dependencies.Projects.glidePalette)
     implementation project(Dependencies.Projects.aesthetic)
 
@@ -265,6 +266,7 @@ dependencies {
     implementation Dependencies.materialDialogCommons
     implementation Dependencies.expandableRecyclerView
     implementation Dependencies.billing
+    implementation Dependencies.timber
 
     implementation Dependencies.butterknife
     annotationProcessor Dependencies.butterknifeAnnotationProcessor

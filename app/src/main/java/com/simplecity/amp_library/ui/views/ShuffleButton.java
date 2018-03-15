@@ -11,21 +11,24 @@ import android.util.AttributeSet;
 
 import com.afollestad.aesthetic.Aesthetic;
 import com.simplecity.amp_library.R;
-import com.simplecity.amp_library.playback.MusicService;
+import com.simplecity.amp_library.playback.QueueManager;
+import com.simplecity.amp_library.playback.settings.MusicSettings;
 
 import io.reactivex.disposables.Disposable;
 
 public class ShuffleButton extends android.support.v7.widget.AppCompatImageButton {
 
-    @MusicService.ShuffleMode
-    private int shuffleMode;
+    @QueueManager.ShuffleMode
+    private String shuffleMode;
 
     private Disposable aestheticDisposable;
 
     int selectedColor = Color.WHITE;
 
-    @NonNull Drawable shuffleOff;
-    @NonNull Drawable shuffleTracks;
+    @NonNull
+    Drawable shuffleOff;
+    @NonNull
+    Drawable shuffleTracks;
 
     public ShuffleButton(Context context) {
         this(context, null);
@@ -41,21 +44,21 @@ public class ShuffleButton extends android.support.v7.widget.AppCompatImageButto
         shuffleOff = ContextCompat.getDrawable(context, R.drawable.ic_shuffle_24dp_scaled);
         shuffleTracks = DrawableCompat.wrap(ContextCompat.getDrawable(context, R.drawable.ic_shuffle_24dp_scaled).mutate());
 
-        setShuffleMode(MusicService.ShuffleMode.OFF);
+        setShuffleMode(MusicSettings.getInstance().getShuffleMode());
     }
 
-    public void setShuffleMode(@MusicService.ShuffleMode int shuffleMode) {
-        if (this.shuffleMode != shuffleMode) {
+    public void setShuffleMode(@NonNull @QueueManager.ShuffleMode String shuffleMode) {
+        if (!shuffleMode.equals(this.shuffleMode)) {
             this.shuffleMode = shuffleMode;
 
             invalidateColors(selectedColor);
 
             switch (shuffleMode) {
-                case MusicService.ShuffleMode.OFF:
+                case QueueManager.ShuffleMode.OFF:
                     setContentDescription(getResources().getString(R.string.btn_shuffle_off));
                     setImageDrawable(shuffleOff);
                     break;
-                case MusicService.ShuffleMode.ON:
+                case QueueManager.ShuffleMode.ON:
                     setContentDescription(getResources().getString(R.string.btn_shuffle_on));
                     setImageDrawable(shuffleTracks);
                     break;

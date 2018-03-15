@@ -17,8 +17,8 @@ import com.simplecity.amp_library.model.Song;
 import com.simplecity.amp_library.ui.adapters.ViewType;
 import com.simplecity.amp_library.ui.views.NonScrollImageButton;
 import com.simplecity.amp_library.ui.views.PlayCountView;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecity.amp_library.utils.PlaceholderProvider;
-import com.simplecity.amp_library.utils.SettingsManager;
 import com.simplecity.amp_library.utils.SortManager;
 import com.simplecity.amp_library.utils.StringUtils;
 import com.simplecityapps.recycler_adapter.recyclerview.BaseViewHolder;
@@ -184,7 +184,7 @@ public class SongView extends BaseSelectableViewModel<SongView.ViewHolder> imple
         }
 
         if (holder.artwork != null) {
-            if (showAlbumArt && SettingsManager.getInstance().showArtworkInQueue()) {
+            if (showAlbumArt && UISettings.getInstance().showArtworkInQueue()) {
                 holder.artwork.setVisibility(View.VISIBLE);
                 requestManager.load(song)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)

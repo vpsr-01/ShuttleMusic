@@ -25,7 +25,8 @@ import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.model.Playlist;
 import com.simplecity.amp_library.model.Query;
-import com.simplecity.amp_library.playback.MusicService;
+import com.simplecity.amp_library.playback.MusicUtils;
+import com.simplecity.amp_library.playback.old.Constants;
 import com.simplecity.amp_library.sql.sqlbrite.SqlBriteUtils;
 import com.simplecity.amp_library.ui.dialog.ChangelogDialog;
 import com.simplecity.amp_library.ui.drawer.DrawerProvider;
@@ -34,10 +35,9 @@ import com.simplecity.amp_library.ui.fragments.MainController;
 import com.simplecity.amp_library.utils.AnalyticsManager;
 import com.simplecity.amp_library.utils.LogUtils;
 import com.simplecity.amp_library.utils.MusicServiceConnectionUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
 import com.simplecity.amp_library.utils.PlaylistUtils;
-import com.simplecity.amp_library.utils.SettingsManager;
 import com.simplecity.amp_library.utils.ThemeUtils;
+import com.simplecity.amp_library.utils.UISettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ import io.reactivex.schedulers.Schedulers;
 import test.com.androidnavigation.fragment.BackPressHandler;
 import test.com.androidnavigation.fragment.BackPressListener;
 
-public class MainActivity extends BaseCastActivity implements
+public class MainActivity extends BaseActivity implements
         ToolbarListener,
         BackPressHandler,
         DrawerProvider {
@@ -140,12 +140,12 @@ public class MainActivity extends BaseCastActivity implements
     private void handleIntent(Intent intent) {
         Single.fromCallable(() -> {
             boolean handled = false;
-            if (MusicService.ShortcutCommands.PLAYLIST.equals(intent.getAction())) {
+            if (Constants.ShortcutCommands.PLAYLIST.equals(intent.getAction())) {
                 Playlist playlist = (Playlist) intent.getExtras().getSerializable(PlaylistUtils.ARG_PLAYLIST);
                 NavigationEventRelay.NavigationEvent navigationEvent = new NavigationEventRelay.NavigationEvent(NavigationEventRelay.NavigationEvent.Type.PLAYLIST_SELECTED, playlist, true);
                 navigationEventRelay.sendEvent(navigationEvent);
                 handled = true;
-            } else if (MusicService.ShortcutCommands.FOLDERS.equals(intent.getAction())) {
+            } else if (Constants.ShortcutCommands.FOLDERS.equals(intent.getAction())) {
                 NavigationEventRelay.NavigationEvent foldersSelectedEvent = new NavigationEventRelay.NavigationEvent(NavigationEventRelay.NavigationEvent.Type.FOLDERS_SELECTED, null, true);
                 navigationEventRelay.sendEvent(foldersSelectedEvent);
                 handled = true;
@@ -221,17 +221,17 @@ public class MainActivity extends BaseCastActivity implements
     }
 
     private void showChangelogDialog() {
-        int storedVersionCode = SettingsManager.getInstance().getStoredVersionCode();
+        int storedVersionCode = UISettings.getInstance().getStoredVersionCode();
 
         // If we've stored a version code in the past, and it's lower than the current version code,
         // we can show the changelog.
         // Don't show the changelog for first time users.
         if (storedVersionCode != -1 && storedVersionCode < BuildConfig.VERSION_CODE) {
-            if (SettingsManager.getInstance().getShowChangelogOnLaunch()) {
+            if (UISettings.getInstance().getShowChangelogOnLaunch()) {
                 ChangelogDialog.getChangelogDialog(this).show();
             }
         }
-        SettingsManager.getInstance().setVersionCode();
+        UISettings.getInstance().setVersionCode();
     }
 
     @Override

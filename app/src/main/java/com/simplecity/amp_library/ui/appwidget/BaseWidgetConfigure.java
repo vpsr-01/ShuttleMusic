@@ -37,13 +37,14 @@ import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.simplecity.amp_library.R;
-import com.simplecity.amp_library.playback.MusicService;
+import com.simplecity.amp_library.model.Song;
+import com.simplecity.amp_library.playback.old.Constants;
 import com.simplecity.amp_library.ui.activities.BaseActivity;
 import com.simplecity.amp_library.ui.fragments.WidgetFragment;
 import com.simplecity.amp_library.ui.views.SizableSeekBar;
 import com.simplecity.amp_library.ui.widgets.BaseWidgetProvider;
 import com.simplecity.amp_library.utils.ColorUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.playback.MusicUtils;
 
 public abstract class BaseWidgetConfigure extends BaseActivity implements
         View.OnClickListener,
@@ -197,8 +198,8 @@ public abstract class BaseWidgetConfigure extends BaseActivity implements
 
             // Send broadcast intent to any running MediaPlaybackService so it can
             // wrap around with an immediate update.
-            Intent updateIntent = new Intent(MusicService.ServiceCommand.SERVICE_COMMAND);
-            updateIntent.putExtra(MusicService.MediaButtonCommand.CMD_NAME, getUpdateCommandString());
+            Intent updateIntent = new Intent(Constants.ServiceCommand.SERVICE_COMMAND);
+            updateIntent.putExtra(Constants.MediaButtonCommand.CMD_NAME, getUpdateCommandString());
             updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, new int[]{appWidgetId});
             updateIntent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
             sendBroadcast(updateIntent);
@@ -329,21 +330,21 @@ public abstract class BaseWidgetConfigure extends BaseActivity implements
                 TextView text1 = widgetLayout.findViewById(R.id.text1);
                 TextView text2 = widgetLayout.findViewById(R.id.text2);
                 TextView text3 = widgetLayout.findViewById(R.id.text3);
-                String trackName = MusicUtils.getSongName();
-                String artistName = MusicUtils.getAlbumArtistName();
-                final String albumName = MusicUtils.getAlbumName();
-                if (trackName != null && text1 != null) {
-                    text1.setText(trackName);
-                    text1.setTextColor(textColor);
-                }
-                if (artistName != null && albumName != null && text2 != null && text3 == null) {
-                    text2.setText(artistName + " | " + albumName);
-                    text2.setTextColor(textColor);
-                } else if (artistName != null && albumName != null && text2 != null) {
-                    text2.setText(albumName);
-                    text2.setTextColor(textColor);
-                    text3.setText(artistName);
-                    text3.setTextColor(textColor);
+                Song song = MusicUtils.getCurrentSong();
+                if (song != null) {
+                    if (song.name != null && text1 != null) {
+                        text1.setText(song.name);
+                        text1.setTextColor(textColor);
+                    }
+                    if (song.albumArtistName != null && song.albumName != null && text2 != null && text3 == null) {
+                        text2.setText(String.format("%s | %s", song.albumArtistName, song.albumName));
+                        text2.setTextColor(textColor);
+                    } else if (song.albumArtistName != null && song.albumName != null && text2 != null) {
+                        text2.setText(song.albumName);
+                        text2.setTextColor(textColor);
+                        text3.setText(song.albumArtistName);
+                        text3.setTextColor(textColor);
+                    }
                 }
 
                 ImageButton shuffleButton = widgetLayout.findViewById(R.id.shuffle_button);
@@ -370,7 +371,7 @@ public abstract class BaseWidgetConfigure extends BaseActivity implements
                     }
 
                     Glide.with(this)
-                            .load(MusicUtils.getSong())
+                            .load(MusicUtils.getCurrentSong())
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .placeholder(R.drawable.ic_placeholder_light_medium)
                             .into(albumArt);

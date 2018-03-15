@@ -24,6 +24,7 @@ import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.dagger.module.FragmentModule;
 import com.simplecity.amp_library.model.Song;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.ui.presenters.PlayerPresenter;
 import com.simplecity.amp_library.ui.views.PlayPauseView;
 import com.simplecity.amp_library.ui.views.PlayerViewAdapter;
@@ -134,7 +135,7 @@ public class MiniPlayerFragment extends BaseFragment {
         super.onResume();
 
         if (presenter != null) {
-            presenter.updateTrackInfo();
+            presenter.updateTrackInfo(MusicUtils.getCurrentSong());
         }
     }
 

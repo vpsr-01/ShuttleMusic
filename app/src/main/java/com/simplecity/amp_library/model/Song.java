@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
+import android.support.v4.media.MediaMetadataCompat;
 import android.text.TextUtils;
 
 import com.simplecity.amp_library.R;
@@ -427,5 +428,16 @@ public class Song implements
         }
 
         return success;
+    }
+
+    public MediaMetadataCompat getMetadata() {
+        return new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, String.valueOf(id))
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, albumName)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artistName)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, name)
+                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, track)
+                .build();
     }
 }

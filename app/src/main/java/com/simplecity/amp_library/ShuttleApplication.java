@@ -22,11 +22,8 @@ import com.bumptech.glide.Glide;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.core.CrashlyticsCore;
-import com.google.android.libraries.cast.companionlibrary.cast.CastConfiguration;
-import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.simplecity.amp_library.constants.Config;
 import com.simplecity.amp_library.dagger.component.AppComponent;
 import com.simplecity.amp_library.dagger.component.DaggerAppComponent;
 import com.simplecity.amp_library.dagger.module.AppModule;
@@ -44,6 +41,7 @@ import com.simplecity.amp_library.utils.LegacyUtils;
 import com.simplecity.amp_library.utils.LogUtils;
 import com.simplecity.amp_library.utils.SettingsManager;
 import com.simplecity.amp_library.utils.StringUtils;
+import com.simplecity.amp_library.utils.UISettings;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -72,6 +70,7 @@ import io.reactivex.Completable;
 import io.reactivex.CompletableTransformer;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class ShuttleApplication extends Application {
 
@@ -112,6 +111,13 @@ public class ShuttleApplication extends Application {
             // Traceur.enableLogging();
 
             // enableStrictMode();
+
+            Timber.plant(new Timber.DebugTree(){
+                @Override
+                protected String createStackElementTag(StackTraceElement element) {
+                    return "MP|" + super.createStackElementTag(element);
+                }
+            });
         }
 
         appComponent = initDagger(this);
@@ -135,13 +141,6 @@ public class ShuttleApplication extends Application {
         FirebaseApp.initializeApp(this);
         FirebaseAnalytics.getInstance(this);
 
-        VideoCastManager.initialize(this,
-                new CastConfiguration.Builder(Config.CHROMECAST_APP_ID)
-                        .enableLockScreen()
-                        .enableNotification()
-                        .build()
-        );
-
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // we cannot call setDefaultValues for multiple fragment based XML preference
         // files with readAgain flag set to false, so always check KEY_HAS_SET_DEFAULT_VALUES
@@ -161,7 +160,7 @@ public class ShuttleApplication extends Application {
 
         TagOptionSingleton.getInstance().setPadNumbers(true);
 
-        SettingsManager.getInstance().incrementLaunchCount();
+        UISettings.getInstance().incrementLaunchCount();
 
         Completable.fromAction(() -> {
             Query query = new Query.Builder()
@@ -209,14 +208,6 @@ public class ShuttleApplication extends Application {
                 .subscribeOn(Schedulers.io())
                 .subscribe();
 
-    }
-
-    CompletableTransformer doOnDelay(long delay, TimeUnit timeUnit) {
-        return upstream -> Completable.timer(delay, timeUnit)
-                .andThen(Completable.defer(() -> upstream))
-                .doOnError(throwable -> LogUtils.logException(TAG, "Failed to delete old resources", throwable))
-                .onErrorComplete()
-                .subscribeOn(Schedulers.io());
     }
 
     public RefWatcher getRefWatcher() {

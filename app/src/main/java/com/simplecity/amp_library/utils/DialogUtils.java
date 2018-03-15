@@ -32,8 +32,8 @@ public class DialogUtils {
         //If we're in the free version, the app has been launched more than 15 times,
         //The message hasn't been read before, display the 'upgrade to pro' dialog.
         if (!ShuttleUtils.isUpgraded()
-                && SettingsManager.getInstance().getLaunchCount() > 15
-                && !SettingsManager.getInstance().getNagMessageRead()) {
+                && UISettings.getInstance().getLaunchCount() > 15
+                && !UISettings.getInstance().getNagMessageRead()) {
 
             MaterialDialog.Builder builder = getBuilder(context)
                     .title(context.getResources().getString(R.string.get_pro_title))
@@ -43,7 +43,7 @@ public class DialogUtils {
                     .negativeText(R.string.get_pro_button_no);
 
             builder.show();
-            SettingsManager.getInstance().setNagMessageRead();
+            UISettings.getInstance().setNagMessageRead();
 
             AnalyticsManager.logUpgrade(AnalyticsManager.UpgradeType.NAG);
         }
@@ -58,7 +58,7 @@ public class DialogUtils {
         numberPicker = view.findViewById(R.id.weeks);
         numberPicker.setMaxValue(12);
         numberPicker.setMinValue(1);
-        numberPicker.setValue(MusicUtils.getIntPref(context, "numweeks", 2));
+        numberPicker.setValue(UISettings.getInstance().getRecentNumWeeks());
 
         getBuilder(context)
                 .title(R.string.week_selector)
@@ -68,16 +68,16 @@ public class DialogUtils {
                 .onPositive((materialDialog, dialogAction) -> {
                     int numweeks;
                     numweeks = numberPicker.getValue();
-                    MusicUtils.setIntPref(context, "numweeks", numweeks);
+                    UISettings.getInstance().setRecentNumWeeks(numweeks);
                 })
                 .show();
     }
 
     public static void showRateSnackbar(final Activity activity, final View view) {
         //If the user hasn't dismissed the snackbar in the past, and we haven't already shown it for this session
-        if (!SettingsManager.getInstance().getHasRated() && !SettingsManager.getInstance().hasSeenRateSnackbar) {
+        if (!UISettings.getInstance().getHasRated() && !UISettings.getInstance().hasSeenRateSnackbar) {
             //If this is the tenth launch, or a multiple of 50
-            if (SettingsManager.getInstance().getLaunchCount() == 10 || (SettingsManager.getInstance().getLaunchCount() != 0 && SettingsManager.getInstance().getLaunchCount() % 50 == 0)) {
+            if (UISettings.getInstance().getLaunchCount() == 10 || (UISettings.getInstance().getLaunchCount() != 0 && UISettings.getInstance().getLaunchCount() % 50 == 0)) {
 
                 Snackbar snackbar = Snackbar.make(view, R.string.snackbar_rate_text, Snackbar.LENGTH_INDEFINITE)
                         .setDuration(15000)
@@ -93,7 +93,7 @@ public class DialogUtils {
                                 if (event != BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT) {
                                     // We don't really care whether the user has rated or not. The snackbar was
                                     // dismissed. Never show it again.
-                                    SettingsManager.getInstance().setHasRated();
+                                    UISettings.getInstance().setHasRated();
                                 }
                             }
                         });
@@ -107,7 +107,7 @@ public class DialogUtils {
                 AnalyticsManager.logRateShown();
             }
 
-            SettingsManager.getInstance().hasSeenRateSnackbar = true;
+            UISettings.getInstance().hasSeenRateSnackbar = true;
         }
     }
 }

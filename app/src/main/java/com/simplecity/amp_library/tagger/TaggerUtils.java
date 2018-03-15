@@ -13,7 +13,7 @@ import com.crashlytics.android.Crashlytics;
 import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.utils.DialogUtils;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +34,7 @@ public class TaggerUtils {
 	
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static String getDocumentTree() {
-		String treeUri = SettingsManager.getInstance().getDocumentTreeUri();
+		String treeUri = UISettings.getInstance().getDocumentTreeUri();
 		List<UriPermission> perms = ShuttleApplication.getInstance().getContentResolver().getPersistedUriPermissions();
 		for (UriPermission perm : perms) {
 			if (perm.getUri().toString().equals(treeUri) && perm.isWritePermission()) return treeUri;

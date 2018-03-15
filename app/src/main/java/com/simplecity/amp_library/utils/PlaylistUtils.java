@@ -233,11 +233,11 @@ public class PlaylistUtils {
                 .take(autoUpdate ? Long.MAX_VALUE : 1)
                 .doOnNext(playlists -> {
                     subMenu.clear();
-                    subMenu.add(0, MusicUtils.Defs.NEW_PLAYLIST, 0, R.string.new_playlist);
+                    subMenu.add(0, MenuUtils.NEW_PLAYLIST, 0, R.string.new_playlist);
                     for (Playlist playlist : playlists) {
                         final Intent intent = new Intent();
                         intent.putExtra(ARG_PLAYLIST, playlist);
-                        subMenu.add(0, MusicUtils.Defs.PLAYLIST_SELECTED, 0, playlist.name).setIntent(intent);
+                        subMenu.add(0, MenuUtils.PLAYLIST_SELECTED, 0, playlist.name).setIntent(intent);
                     }
                 })
                 .ignoreElements()
@@ -301,7 +301,7 @@ public class PlaylistUtils {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(existingSongs -> {
 
-                    if (!SettingsManager.getInstance().ignoreDuplicates()) {
+                    if (!UISettings.getInstance().ignoreDuplicates()) {
 
                         List<Song> duplicates = Stream.of(existingSongs)
                                 .filter(mutableSongList::contains)
@@ -339,7 +339,7 @@ public class PlaylistUtils {
                                         } else {
                                             //Add all songs to the playlist
                                             insertPlaylistItems(context, playlist, mutableSongList, existingSongs.size(), insertCallback);
-                                            SettingsManager.getInstance().setIgnoreDuplicates(alwaysAdd.isChecked());
+                                            UISettings.getInstance().setIgnoreDuplicates(alwaysAdd.isChecked());
                                             dialog.dismiss();
                                         }
                                     })
@@ -358,7 +358,7 @@ public class PlaylistUtils {
                                                     .filter(mutableSongList::contains)
                                                     .forEach(mutableSongList::remove);
                                             insertPlaylistItems(context, playlist, mutableSongList, existingSongs.size(), insertCallback);
-                                            SettingsManager.getInstance().setIgnoreDuplicates(alwaysAdd.isChecked());
+                                            UISettings.getInstance().setIgnoreDuplicates(alwaysAdd.isChecked());
                                             dialog.dismiss();
                                         }
                                     })

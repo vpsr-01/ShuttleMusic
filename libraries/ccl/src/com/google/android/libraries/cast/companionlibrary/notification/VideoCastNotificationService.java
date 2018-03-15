@@ -49,7 +49,6 @@ import com.google.android.libraries.cast.companionlibrary.utils.Utils;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static android.support.v4.media.app.NotificationCompat.MediaStyle;
 import static com.google.android.libraries.cast.companionlibrary.utils.LogUtils.LOGD;
 import static com.google.android.libraries.cast.companionlibrary.utils.LogUtils.LOGE;
 
@@ -156,7 +155,7 @@ public class VideoCastNotificationService extends Service {
 
             @Override
             public void onMediaQueueUpdated(List<MediaQueueItem> queueItems, MediaQueueItem item,
-                    int repeatMode, boolean shuffle) {
+                                            int repeatMode, boolean shuffle) {
                 int size = 0;
                 int position = 0;
                 if (queueItems != null) {
@@ -336,13 +335,13 @@ public class VideoCastNotificationService extends Service {
                 mCastManager.getDeviceName());
 
         NotificationCompat.Builder builder
-                = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                = (NotificationCompat.Builder) new NotificationCompat.Builder(this, "0")
                 .setSmallIcon(R.drawable.ic_stat_action_notification)
                 .setContentTitle(metadata.getString(MediaMetadata.KEY_TITLE))
                 .setContentText(castingTo)
                 .setContentIntent(getContentIntent(info))
                 .setLargeIcon(bitmap)
-                .setStyle(new MediaStyle()
+                .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
                         .setShowActionsInCompactView(mNotificationCompactActionsArray)
                         .setMediaSession(mCastManager.getMediaSessionCompatToken()))
                 .setOngoing(true)
@@ -406,7 +405,7 @@ public class VideoCastNotificationService extends Service {
         Intent intent = new Intent(this, VideoIntentReceiver.class);
         intent.setAction(ACTION_REWIND);
         intent.setPackage(getPackageName());
-        intent.putExtra(EXTRA_FORWARD_STEP_MS, (int)-millis);
+        intent.putExtra(EXTRA_FORWARD_STEP_MS, (int) -millis);
         PendingIntent pendingIntent = PendingIntent
                 .getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         int iconResourceId = R.drawable.ic_notification_rewind_48dp;

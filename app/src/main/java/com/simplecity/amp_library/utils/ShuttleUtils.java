@@ -204,7 +204,7 @@ public final class ShuttleUtils {
             return true;
         }
 
-        if (SettingsManager.getInstance().getIsLegacyUpgraded()) {
+        if (UISettings.getInstance().getIsLegacyUpgraded()) {
             return true;
         }
 
@@ -215,27 +215,6 @@ public final class ShuttleUtils {
 
         //If something goes wrong, assume the user has the pro version
         return true;
-    }
-
-    /**
-     * @return true if device is running API >= 23
-     */
-    public static boolean hasMarshmallow() {
-        return Build.VERSION.SDK_INT >= 23;
-    }
-
-    /**
-     * @return true if device is running API >= 24
-     */
-    public static boolean hasNougat() {
-        return Build.VERSION.SDK_INT >= 24;
-    }
-
-    /**
-     * @return true if device is running API >= 26
-     */
-    public static boolean hasOreo() {
-        return Build.VERSION.SDK_INT >= 26;
     }
 
     public static boolean isLandscape() {

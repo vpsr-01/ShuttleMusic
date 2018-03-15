@@ -29,7 +29,7 @@ public final class SqlBriteUtils {
     private static BriteContentResolver wrapContentProvider(@NonNull Context context) {
         final SqlBrite sqlBrite = new SqlBrite.Builder().build();
         BriteContentResolver briteContentResolver = sqlBrite.wrapContentProvider(context.getContentResolver(), Schedulers.io());
-        briteContentResolver.setLoggingEnabled(BuildConfig.DEBUG);
+        briteContentResolver.setLoggingEnabled(false && BuildConfig.DEBUG);
         return briteContentResolver;
     }
 

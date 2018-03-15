@@ -238,11 +238,11 @@ public class ViewModelAdapter extends RecyclerView.Adapter {
             return newList != null ? newList.size() : 0;
         }
 
-        Object getOldItem(int oldItemPosition) {
+        ViewModel getOldItem(int oldItemPosition) {
             return oldList.get(oldItemPosition);
         }
 
-        Object getNewItem(int newItemPosition) {
+        ViewModel getNewItem(int newItemPosition) {
             return newList.get(newItemPosition);
         }
 
@@ -261,7 +261,7 @@ public class ViewModelAdapter extends RecyclerView.Adapter {
             Object oldItem = getOldItem(oldItemPosition);
             Object newItem = getNewItem(newItemPosition);
 
-            if (oldItem instanceof ContentsComparator) {
+            if (oldItem != null) {
                 return ((ContentsComparator) oldItem).areContentsEqual(newItem);
             } else {
                 return areItemsTheSame(oldItemPosition, newItemPosition);

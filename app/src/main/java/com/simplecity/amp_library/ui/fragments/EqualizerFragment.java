@@ -25,12 +25,12 @@ import android.widget.TextView;
 import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.constants.OpenSLESConstants;
-import com.simplecity.amp_library.services.Equalizer;
+import com.simplecity.amp_library.playback.Equalizer;
 import com.simplecity.amp_library.ui.adapters.RobotoSpinnerAdapter;
 import com.simplecity.amp_library.ui.drawer.DrawerLockManager;
 import com.simplecity.amp_library.ui.drawer.MiniPlayerLockManager;
 import com.simplecity.amp_library.ui.views.SizableSeekBar;
-import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.playback.MusicUtils;
 
 import java.util.Formatter;
 import java.util.Locale;

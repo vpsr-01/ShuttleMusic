@@ -30,11 +30,10 @@ import com.simplecity.amp_library.ui.recyclerview.GridDividerDecoration;
 import com.simplecity.amp_library.ui.views.ContextualToolbar;
 import com.simplecity.amp_library.utils.ContextualToolbarHelper;
 import com.simplecity.amp_library.utils.DataManager;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecity.amp_library.utils.MenuUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
 import com.simplecity.amp_library.utils.PermissionUtils;
 import com.simplecity.amp_library.utils.PlaylistUtils;
-import com.simplecity.amp_library.utils.SettingsManager;
 import com.simplecity.amp_library.utils.SortManager;
 import com.simplecityapps.recycler_adapter.model.ViewModel;
 import com.simplecityapps.recycler_adapter.recyclerview.RecyclerListener;
@@ -51,7 +50,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 
 public class AlbumArtistFragment extends BaseFragment implements
-        MusicUtils.Defs,
         AlbumArtistView.ClickListener {
 
     interface AlbumArtistClickListener {
@@ -125,7 +123,7 @@ public class AlbumArtistFragment extends BaseFragment implements
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         if (recyclerView == null) {
-            int spanCount = SettingsManager.getInstance().getArtistColumnCount(getResources());
+            int spanCount = UISettings.getInstance().getArtistColumnCount(getResources());
             layoutManager = new GridLayoutManager(getContext(), spanCount);
             spanSizeLookup = new SpanSizeLookup(adapter, spanCount);
             spanSizeLookup.setSpanIndexCacheEnabled(true);
@@ -172,7 +170,7 @@ public class AlbumArtistFragment extends BaseFragment implements
         PermissionUtils.RequestStoragePermissions(() -> {
             if (getActivity() != null && isAdded()) {
 
-                int artistDisplayType = SettingsManager.getInstance().getArtistDisplayType();
+                int artistDisplayType = UISettings.getInstance().getArtistDisplayType();
 
                 boolean ascending = SortManager.getInstance().getArtistsAscending();
 
@@ -268,7 +266,7 @@ public class AlbumArtistFragment extends BaseFragment implements
             sortAscending.setChecked(SortManager.getInstance().getArtistsAscending());
         }
 
-        int displayType = SettingsManager.getInstance().getArtistDisplayType();
+        int displayType = UISettings.getInstance().getArtistDisplayType();
         switch (displayType) {
             case ViewType.ARTIST_LIST:
                 MenuItem viewAsList = menu.findItem(R.id.view_as_list);
@@ -303,7 +301,7 @@ public class AlbumArtistFragment extends BaseFragment implements
             gridMenuItem.setVisible(true);
             SubMenu subMenu = gridMenuItem.getSubMenu();
             if (subMenu != null) {
-                subMenu.findItem(SettingsManager.getInstance().getArtistColumnCount(getResources()))
+                subMenu.findItem(UISettings.getInstance().getArtistColumnCount(getResources()))
                         .setChecked(true);
             }
         }
@@ -330,34 +328,34 @@ public class AlbumArtistFragment extends BaseFragment implements
                 break;
             case R.id.view_as_list:
                 int viewType = ViewType.ARTIST_LIST;
-                SettingsManager.getInstance().setArtistDisplayType(viewType);
+                UISettings.getInstance().setArtistDisplayType(viewType);
                 setupListSpan();
                 updateViewType(viewType);
                 break;
             case R.id.view_as_grid:
                 viewType = ViewType.ARTIST_GRID;
-                SettingsManager.getInstance().setArtistDisplayType(viewType);
+                UISettings.getInstance().setArtistDisplayType(viewType);
                 setupGridSpan();
                 updateViewType(viewType);
                 break;
             case R.id.view_as_grid_card:
                 viewType = ViewType.ARTIST_CARD;
-                SettingsManager.getInstance().setArtistDisplayType(viewType);
+                UISettings.getInstance().setArtistDisplayType(viewType);
                 setupGridSpan();
                 updateViewType(viewType);
                 break;
             case R.id.view_as_grid_palette:
                 viewType = ViewType.ARTIST_PALETTE;
-                SettingsManager.getInstance().setArtistDisplayType(viewType);
+                UISettings.getInstance().setArtistDisplayType(viewType);
                 setupGridSpan();
                 updateViewType(viewType);
                 break;
         }
 
         if (item.getGroupId() == MENU_GROUP_GRID) {
-            SettingsManager.getInstance().setArtistColumnCount(item.getItemId());
+            UISettings.getInstance().setArtistColumnCount(item.getItemId());
             spanSizeLookup.setSpanCount(item.getItemId());
-            ((GridLayoutManager) recyclerView.getLayoutManager()).setSpanCount(SettingsManager.getInstance().getArtistColumnCount(getResources()));
+            ((GridLayoutManager) recyclerView.getLayoutManager()).setSpanCount(UISettings.getInstance().getArtistColumnCount(getResources()));
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }
 
@@ -367,7 +365,7 @@ public class AlbumArtistFragment extends BaseFragment implements
     }
 
     private void setupGridSpan() {
-        int spanCount = SettingsManager.getInstance().getArtistColumnCount(getResources());
+        int spanCount = UISettings.getInstance().getArtistColumnCount(getResources());
         spanSizeLookup.setSpanCount(spanCount);
         layoutManager.setSpanCount(spanCount);
     }

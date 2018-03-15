@@ -5,7 +5,7 @@ import com.bumptech.glide.load.data.DataFetcher;
 import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.model.ArtworkProvider;
 import com.simplecity.amp_library.model.UserSelectedArtwork;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecity.amp_library.utils.ShuttleUtils;
 
 import java.io.File;
@@ -70,31 +70,31 @@ public class MultiFetcher implements DataFetcher<InputStream> {
         //No user selected artwork. Check local then remote sources, according to user's preferences.
 
         //Check the MediaStore
-        if (inputStream == null && !SettingsManager.getInstance().ignoreMediaStoreArtwork()) {
+        if (inputStream == null && !UISettings.getInstance().ignoreMediaStoreArtwork()) {
             dataFetcher = new MediaStoreFetcher(artworkProvider);
             inputStream = loadData(dataFetcher, priority);
         }
 
         if (inputStream == null) {
-            if (SettingsManager.getInstance().preferEmbeddedArtwork()) {
+            if (UISettings.getInstance().preferEmbeddedArtwork()) {
                 //Check tags
-                if (!SettingsManager.getInstance().ignoreEmbeddedArtwork()) {
+                if (!UISettings.getInstance().ignoreEmbeddedArtwork()) {
                     dataFetcher = new TagFetcher(artworkProvider);
                     inputStream = loadData(dataFetcher, priority);
                 }
                 //Check folders
-                if (inputStream == null && !SettingsManager.getInstance().ignoreFolderArtwork()) {
+                if (inputStream == null && !UISettings.getInstance().ignoreFolderArtwork()) {
                     dataFetcher = new FolderFetcher(artworkProvider, null);
                     inputStream = loadData(dataFetcher, priority);
                 }
             } else {
                 //Check folders
-                if (!SettingsManager.getInstance().ignoreFolderArtwork()) {
+                if (!UISettings.getInstance().ignoreFolderArtwork()) {
                     dataFetcher = new FolderFetcher(artworkProvider, null);
                     inputStream = loadData(dataFetcher, priority);
                 }
                 //Check tags
-                if (inputStream == null && !SettingsManager.getInstance().ignoreEmbeddedArtwork()) {
+                if (inputStream == null && !UISettings.getInstance().ignoreEmbeddedArtwork()) {
                     dataFetcher = new TagFetcher(artworkProvider);
                     inputStream = loadData(dataFetcher, priority);
                 }
@@ -103,11 +103,11 @@ public class MultiFetcher implements DataFetcher<InputStream> {
 
         if (inputStream == null) {
             if (allowOfflineDownload
-                    || (SettingsManager.getInstance().canDownloadArtworkAutomatically()
+                    || (UISettings.getInstance().canDownloadArtworkAutomatically()
                     && ShuttleUtils.isOnline(true))) {
 
                 //Last FM
-                if (SettingsManager.getInstance().preferLastFM()) {
+                if (UISettings.getInstance().preferLastFM()) {
                     dataFetcher = new LastFmFetcher(artworkProvider);
                     inputStream = loadData(dataFetcher, priority);
                 } else {

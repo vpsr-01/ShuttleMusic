@@ -24,11 +24,11 @@ import com.simplecity.amp_library.ui.modelviews.SongView;
 import com.simplecity.amp_library.ui.presenters.Presenter;
 import com.simplecity.amp_library.utils.ContextualToolbarHelper;
 import com.simplecity.amp_library.utils.DataManager;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecity.amp_library.utils.LogUtils;
 import com.simplecity.amp_library.utils.MenuUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.utils.Operators;
-import com.simplecity.amp_library.utils.SettingsManager;
 import com.simplecity.amp_library.utils.ShuttleUtils;
 import com.simplecity.amp_library.utils.StringUtils;
 import com.simplecityapps.recycler_adapter.model.ViewModel;
@@ -74,9 +74,9 @@ public class SearchPresenter extends Presenter<SearchView> implements
     public void bindView(@NonNull SearchView view) {
         super.bindView(view);
 
-        view.setFilterFuzzyChecked(SettingsManager.getInstance().getSearchFuzzy());
-        view.setFilterArtistsChecked(SettingsManager.getInstance().getSearchArtists());
-        view.setFilterAlbumsChecked(SettingsManager.getInstance().getSearchAlbums());
+        view.setFilterFuzzyChecked(UISettings.getInstance().getSearchFuzzy());
+        view.setFilterArtistsChecked(UISettings.getInstance().getSearchArtists());
+        view.setFilterAlbumsChecked(UISettings.getInstance().getSearchAlbums());
     }
 
     @Override
@@ -116,13 +116,13 @@ public class SearchPresenter extends Presenter<SearchView> implements
                 performSearchSubscription.dispose();
             }
 
-            boolean searchArtists = SettingsManager.getInstance().getSearchArtists();
+            boolean searchArtists = UISettings.getInstance().getSearchArtists();
 
             Single<List<ViewModel>> albumArtistsObservable = searchArtists ? DataManager.getInstance().getAlbumArtistsRelay()
                     .first(Collections.emptyList())
                     .lift(new AlbumArtistFilterOperator(query, requestManager, prefixHighlighter)) : Single.just(Collections.emptyList());
 
-            boolean searchAlbums = SettingsManager.getInstance().getSearchAlbums();
+            boolean searchAlbums = UISettings.getInstance().getSearchAlbums();
 
             Single<List<ViewModel>> albumsObservable = searchAlbums ? DataManager.getInstance().getAlbumsRelay()
                     .first(Collections.emptyList())
@@ -161,17 +161,17 @@ public class SearchPresenter extends Presenter<SearchView> implements
     }
 
     void setSearchFuzzy(boolean searchFuzzy) {
-        SettingsManager.getInstance().setSearchFuzzy(searchFuzzy);
+        UISettings.getInstance().setSearchFuzzy(searchFuzzy);
         loadData(query);
     }
 
     void setSearchArtists(boolean searchArtists) {
-        SettingsManager.getInstance().setSearchArtists(searchArtists);
+        UISettings.getInstance().setSearchArtists(searchArtists);
         loadData(query);
     }
 
     void setSearchAlbums(boolean searchAlbums) {
-        SettingsManager.getInstance().setSearchAlbums(searchAlbums);
+        UISettings.getInstance().setSearchAlbums(searchAlbums);
         loadData(query);
     }
 
@@ -296,7 +296,7 @@ public class SearchPresenter extends Presenter<SearchView> implements
                     List<AlbumArtist> albumArtists = Operators.albumsToAlbumArtists(albums);
                     Collections.sort(albumArtists, AlbumArtist::compareTo);
 
-                    boolean fuzzy = SettingsManager.getInstance().getSearchFuzzy();
+                    boolean fuzzy = UISettings.getInstance().getSearchFuzzy();
 
                     Stream<Song> songStream = Stream.of(songs)
                             .filter(song -> song.name != null);
@@ -370,7 +370,7 @@ public class SearchPresenter extends Presenter<SearchView> implements
 
                     Collections.sort(albums, Album::compareTo);
 
-                    boolean fuzzy = SettingsManager.getInstance().getSearchFuzzy();
+                    boolean fuzzy = UISettings.getInstance().getSearchFuzzy();
 
                     Stream<Album> albumStream = Stream.of(albums)
                             .filter(album -> album.name != null);
@@ -441,7 +441,7 @@ public class SearchPresenter extends Presenter<SearchView> implements
 
                     Collections.sort(albumArtists, AlbumArtist::compareTo);
 
-                    boolean fuzzy = SettingsManager.getInstance().getSearchFuzzy();
+                    boolean fuzzy = UISettings.getInstance().getSearchFuzzy();
 
                     Stream<AlbumArtist> albumArtistStream = Stream.of(albumArtists)
                             .filter(albumArtist -> albumArtist.name != null);

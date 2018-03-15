@@ -24,6 +24,7 @@ object Dependencies {
         const val daggerAnnotationProcessor = "2.14.1"
         const val expandableRecyclerView = "3.0.0-RC1"
         const val billing = "1.0"
+        const val timber = "4.6.1"
     }
 
     // Kotlin
@@ -72,6 +73,9 @@ object Dependencies {
     // In app purchases
     const val billing = "com.android.billingclient:billing:${Versions.billing}"
 
+    // Timber
+    const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
+
 
     object Plugins {
 
@@ -101,7 +105,9 @@ object Dependencies {
             const val firebaseCore = "11.8.0"
             const val firebaseRemoteConfig = "11.8.0"
             const val chromecast = "11.8.0"
+            const val castFramework = "10.0.1"
             const val constraintLayout = "1.1.0-beta5"
+            const val exoPlayer = "2.7.1"
         }
 
         const val cardView = "com.android.support:cardview-v7:${Versions.supportLib}"
@@ -114,9 +120,11 @@ object Dependencies {
         const val appcompat = "com.android.support:appcompat-v7:${Versions.supportLib}"
         const val mediarouter = "com.android.support:mediarouter-v7:${Versions.supportLib}"
         const val chromecast = "com.google.android.gms:play-services-cast:${Versions.chromecast}"
+        const val castFramework = "com.google.android.gms:play-services-cast-framework:${Versions.chromecast}"
         const val constraintLayout = "com.android.support.constraint:constraint-layout:${Versions.constraintLayout}"
         const val prefCompat = "com.android.support:preference-v7:${Versions.supportLib}"
         const val prefCompatv14 = "com.android.support:preference-v14:${Versions.supportLib}"
+        const val exoPlayer = "com.google.android.exoplayer:exoplayer:${Versions.exoPlayer}"
     }
 
     object Square {
@@ -222,9 +230,6 @@ object Dependencies {
 
 
     object Projects {
-
-        // Cast Companion Library
-        val ccl = ":libraries:ccl"
 
         // Glide Palette - https://git.io/vix57 (Florent Champigny)
         val glidePalette = ":libraries:glidepalette"

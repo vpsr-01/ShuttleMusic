@@ -20,9 +20,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.simplecity.amp_library.R;
-import com.simplecity.amp_library.playback.MusicService;
+import com.simplecity.amp_library.model.Song;
+import com.simplecity.amp_library.playback.old.Constants;
 import com.simplecity.amp_library.utils.MusicServiceConnectionUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.playback.MusicUtils;
 
 
 //Todo: Reapply themes
@@ -107,8 +108,8 @@ public class QCircleActivity extends BaseActivity {
         super.onStart();
 
         final IntentFilter filter = new IntentFilter();
-        filter.addAction(MusicService.InternalIntents.PLAY_STATE_CHANGED);
-        filter.addAction(MusicService.InternalIntents.META_CHANGED);
+        filter.addAction(Constants.InternalIntents.PLAY_STATE_CHANGED);
+        filter.addAction(Constants.InternalIntents.META_CHANGED);
         registerReceiver(mStatusListener, new IntentFilter(filter));
 
     }
@@ -233,10 +234,10 @@ public class QCircleActivity extends BaseActivity {
 
         prevBtn.setOnClickListener(v -> MusicUtils.previous(true));
 
-        skipBtn.setOnClickListener(v -> MusicUtils.next());
+        skipBtn.setOnClickListener(v -> MusicUtils.skip());
 
         pauseBtn.setOnClickListener(v -> {
-            MusicUtils.playOrPause();
+            MusicUtils.togglePlayback();
             setPauseButtonImage();
         });
 
@@ -268,8 +269,12 @@ public class QCircleActivity extends BaseActivity {
         if (textOne == null || textTwo == null) {
             return;
         }
-        textOne.setText(MusicUtils.getAlbumArtistName());
-        textTwo.setText(MusicUtils.getSongName());
+
+        Song song = MusicUtils.getCurrentSong();
+        if (song != null) {
+            textOne.setText(song.albumArtistName);
+            textTwo.setText(song.name);
+        }
     }
 
     private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
@@ -324,10 +329,10 @@ public class QCircleActivity extends BaseActivity {
 
             final String action = intent.getAction();
             if (action != null) {
-                if (action.equals(MusicService.InternalIntents.META_CHANGED)) {
+                if (action.equals(Constants.InternalIntents.META_CHANGED)) {
                     updateTrackInfo();
                     setPauseButtonImage();
-                } else if (action.equals(MusicService.InternalIntents.PLAY_STATE_CHANGED)) {
+                } else if (action.equals(Constants.InternalIntents.PLAY_STATE_CHANGED)) {
                     setPauseButtonImage();
                 }
             }

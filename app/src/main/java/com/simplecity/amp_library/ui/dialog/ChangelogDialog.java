@@ -14,7 +14,7 @@ import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.utils.DialogUtils;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecity.amp_library.utils.ViewUtils;
 
 public class ChangelogDialog {
@@ -32,8 +32,8 @@ public class ChangelogDialog {
         webView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 
         CheckBox checkBox = customView.findViewById(R.id.checkbox);
-        checkBox.setChecked(SettingsManager.getInstance().getShowChangelogOnLaunch());
-        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> SettingsManager.getInstance().setShowChangelogOnLaunch(isChecked));
+        checkBox.setChecked(UISettings.getInstance().getShowChangelogOnLaunch());
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> UISettings.getInstance().setShowChangelogOnLaunch(isChecked));
 
         ProgressBar progressBar = customView.findViewById(R.id.progress);
 

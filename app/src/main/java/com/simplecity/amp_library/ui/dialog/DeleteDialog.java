@@ -22,12 +22,12 @@ import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.model.Album;
 import com.simplecity.amp_library.model.AlbumArtist;
 import com.simplecity.amp_library.model.Song;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.saf.SafManager;
 import com.simplecity.amp_library.sql.providers.PlayCountTable;
 import com.simplecity.amp_library.utils.CustomMediaScanner;
 import com.simplecity.amp_library.utils.DialogUtils;
 import com.simplecity.amp_library.utils.LogUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
 
 import java.io.File;
 import java.io.Serializable;

@@ -27,7 +27,7 @@ import com.simplecity.amp_library.ui.dialog.TabChooserDialog;
 import com.simplecity.amp_library.ui.presenters.PurchasePresenter;
 import com.simplecity.amp_library.utils.AnalyticsManager;
 import com.simplecity.amp_library.utils.ColorPalette;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecity.amp_library.utils.ShuttleUtils;
 
 import java.util.List;
@@ -81,7 +81,7 @@ public class SettingsPresenter extends PurchasePresenter<SettingsView> {
                     .filter(categoryItem -> categoryItem.isChecked)
                     .toList();
 
-            int defaultPageType = SettingsManager.getInstance().getDefaultPageType();
+            int defaultPageType = UISettings.getInstance().getDefaultPageType();
             int defaultPage = Math.min(Stream.of(categoryItems)
                     .indexed()
                     .filter(categoryItemIntPair -> categoryItemIntPair.getSecond().type == defaultPageType)
@@ -96,7 +96,7 @@ public class SettingsPresenter extends PurchasePresenter<SettingsView> {
                                     .map(categoryItem -> context.getString(categoryItem.getTitleResId()))
                                     .toList())
                             .itemsCallbackSingleChoice(defaultPage, (dialog, itemView, which, text) -> {
-                                SettingsManager.getInstance().setDefaultPageType(categoryItems.get(which).type);
+                                UISettings.getInstance().setDefaultPageType(categoryItems.get(which).type);
                                 return false;
                             })
                             .build());
@@ -163,7 +163,7 @@ public class SettingsPresenter extends PurchasePresenter<SettingsView> {
                 .colorStatusBarAuto()
                 .apply();
 
-        SettingsManager.getInstance().storePrimaryColor(color);
+        UISettings.getInstance().storePrimaryColor(color);
     }
 
     public void accentColorClicked(Context context) {
@@ -185,7 +185,7 @@ public class SettingsPresenter extends PurchasePresenter<SettingsView> {
                 .colorAccent(color)
                 .apply();
 
-        SettingsManager.getInstance().storeAccentColor(color);
+        UISettings.getInstance().storeAccentColor(color);
     }
 
     public void tintNavBarClicked(Context context, boolean tintNavBar) {
@@ -197,12 +197,12 @@ public class SettingsPresenter extends PurchasePresenter<SettingsView> {
     public void usePaletteClicked(Context context, boolean usePalette) {
         // If we're not using palette any more, set the primary color back to default
         if (!usePalette) {
-            int storedColor = SettingsManager.getInstance().getPrimaryColor();
+            int storedColor = UISettings.getInstance().getPrimaryColor();
 
             Aesthetic.get(context)
                     .colorPrimary(storedColor == -1 ? ContextCompat.getColor(context, R.color.md_blue_500) : storedColor)
                     .colorStatusBarAuto()
-                    .colorNavigationBarAuto(SettingsManager.getInstance().getTintNavBar())
+                    .colorNavigationBarAuto(UISettings.getInstance().getTintNavBar())
                     .apply();
         }
     }
@@ -210,12 +210,12 @@ public class SettingsPresenter extends PurchasePresenter<SettingsView> {
     public void usePaletteNowPlayingOnlyClicked(Context context, boolean usePaletteNowPlayingOnly) {
         // If we're only using palette for 'now playing', set the primary color back to default
         if (usePaletteNowPlayingOnly) {
-            int storedColor = SettingsManager.getInstance().getPrimaryColor();
+            int storedColor = UISettings.getInstance().getPrimaryColor();
 
             Aesthetic.get(context)
                     .colorPrimary(storedColor == -1 ? ContextCompat.getColor(context, R.color.md_blue_500) : storedColor)
                     .colorStatusBarAuto()
-                    .colorNavigationBarAuto(SettingsManager.getInstance().getTintNavBar())
+                    .colorNavigationBarAuto(UISettings.getInstance().getTintNavBar())
                     .apply();
         }
     }

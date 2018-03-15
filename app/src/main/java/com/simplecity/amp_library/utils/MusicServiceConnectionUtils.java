@@ -8,8 +8,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import com.simplecity.amp_library.playback.LocalBinder;
 import com.simplecity.amp_library.playback.MusicService;
+import com.simplecity.amp_library.playback.LocalBinder;
 
 import java.util.WeakHashMap;
 
@@ -65,7 +65,7 @@ public class MusicServiceConnectionUtils {
 
         private final ServiceConnection callback;
 
-        public ServiceBinder(final ServiceConnection callback) {
+        ServiceBinder(final ServiceConnection callback) {
             this.callback = callback;
         }
 
@@ -90,14 +90,14 @@ public class MusicServiceConnectionUtils {
 
     public static final class ServiceToken {
 
-        public ContextWrapper wrappedContext;
+        ContextWrapper wrappedContext;
 
         /**
          * Constructor of <code>ServiceToken</code>
          *
          * @param context The {@link ContextWrapper} to use
          */
-        public ServiceToken(final ContextWrapper context) {
+        ServiceToken(final ContextWrapper context) {
             wrappedContext = context;
         }
     }

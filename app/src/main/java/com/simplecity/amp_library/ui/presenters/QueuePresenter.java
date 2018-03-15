@@ -15,12 +15,16 @@ import com.cantrowitz.rxbroadcast.RxBroadcast;
 import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.model.Playlist;
 import com.simplecity.amp_library.model.Song;
-import com.simplecity.amp_library.playback.MusicService;
+import com.simplecity.amp_library.playback.old.Constants;
+import com.simplecity.amp_library.playback.events.MetadataChangedEvent;
+import com.simplecity.amp_library.playback.events.MusicEventRelay;
+import com.simplecity.amp_library.playback.events.QueueChangedEvent;
+import com.simplecity.amp_library.playback.events.QueuePositionChangedEvent;
 import com.simplecity.amp_library.ui.modelviews.SongView;
 import com.simplecity.amp_library.ui.views.QueueView;
 import com.simplecity.amp_library.utils.ContextualToolbarHelper;
 import com.simplecity.amp_library.utils.MenuUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.utils.PlaylistUtils;
 import com.simplecity.amp_library.utils.ShuttleUtils;
 import com.simplecityapps.recycler_adapter.model.ViewModel;
@@ -42,6 +46,8 @@ public class QueuePresenter extends Presenter<QueueView> {
     public QueuePresenter(RequestManager requestManager, ContextualToolbarHelper<Song> contextualToolbarHelper) {
         this.requestManager = requestManager;
         this.contextualToolbarHelper = contextualToolbarHelper;
+
+        ShuttleApplication.getInstance().getAppComponent().inject(this);
     }
 
     @Override
@@ -49,9 +55,9 @@ public class QueuePresenter extends Presenter<QueueView> {
         super.bindView(view);
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction(MusicService.InternalIntents.META_CHANGED);
+        filter.addAction(Constants.InternalIntents.META_CHANGED);
         addDisposable(RxBroadcast.fromBroadcast(ShuttleApplication.getInstance(), filter)
-                .startWith(new Intent(MusicService.InternalIntents.QUEUE_CHANGED))
+                .startWith(new Intent(Constants.InternalIntents.QUEUE_CHANGED))
                 .toFlowable(BackpressureStrategy.LATEST)
                 .debounce(150, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -62,23 +68,16 @@ public class QueuePresenter extends Presenter<QueueView> {
                     }
                 }));
 
-        filter = new IntentFilter();
-        filter.addAction(MusicService.InternalIntents.REPEAT_CHANGED);
-        filter.addAction(MusicService.InternalIntents.SHUFFLE_CHANGED);
-        filter.addAction(MusicService.InternalIntents.QUEUE_CHANGED);
-        filter.addAction(MusicService.InternalIntents.SERVICE_CONNECTED);
-        addDisposable(RxBroadcast.fromBroadcast(ShuttleApplication.getInstance(), filter)
-                .startWith(new Intent(MusicService.InternalIntents.QUEUE_CHANGED))
-                .toFlowable(BackpressureStrategy.LATEST)
-                .filter(intent -> {
-                    if (MusicService.InternalIntents.QUEUE_CHANGED.equals(intent.getAction()) && intent.getBooleanExtra(MusicService.FROM_USER, false)) {
-                        return false;
-                    }
-                    return true;
-                })
-                .debounce(150, TimeUnit.MILLISECONDS)
+        addDisposable(MusicEventRelay.getInstance().getEvents()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(intent -> loadData()));
+                .subscribe(queueEvent -> {
+                    switch (queueEvent.getType()) {
+                        case MetadataChangedEvent.TYPE:
+                        case QueueChangedEvent.TYPE:
+                        case QueuePositionChangedEvent.TYPE:
+                            loadData();
+                    }
+                }));
     }
 
     public void saveQueue(Context context) {

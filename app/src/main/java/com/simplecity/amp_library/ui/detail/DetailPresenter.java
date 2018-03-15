@@ -8,7 +8,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.simplecity.amp_library.model.Playlist;
 import com.simplecity.amp_library.tagger.TaggerDialog;
 import com.simplecity.amp_library.ui.presenters.Presenter;
-import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.utils.PermissionUtils;
 import com.simplecity.amp_library.utils.PlaylistUtils;
 import com.simplecity.amp_library.utils.ShuttleUtils;

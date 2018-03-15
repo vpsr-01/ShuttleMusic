@@ -29,6 +29,7 @@ import com.simplecity.amp_library.interfaces.FileType;
 import com.simplecity.amp_library.model.BaseFileObject;
 import com.simplecity.amp_library.model.InclExclItem;
 import com.simplecity.amp_library.model.Song;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.ui.dialog.UpgradeDialog;
 import com.simplecity.amp_library.ui.drawer.DrawerLockManager;
 import com.simplecity.amp_library.ui.modelviews.BreadcrumbsView;
@@ -43,10 +44,9 @@ import com.simplecity.amp_library.utils.FileBrowser;
 import com.simplecity.amp_library.utils.FileHelper;
 import com.simplecity.amp_library.utils.LogUtils;
 import com.simplecity.amp_library.utils.MenuUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
-import com.simplecity.amp_library.utils.SettingsManager;
 import com.simplecity.amp_library.utils.ShuttleUtils;
 import com.simplecity.amp_library.utils.SortManager;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecityapps.recycler_adapter.adapter.ViewModelAdapter;
 import com.simplecityapps.recycler_adapter.model.ViewModel;
 import com.simplecityapps.recycler_adapter.recyclerview.RecyclerListener;
@@ -294,7 +294,7 @@ public class FolderFragment extends BaseFragment implements
 
     private void updateMenuItems(Menu menu) {
 
-        switch (SettingsManager.getInstance().getFolderBrowserFilesSortOrder()) {
+        switch (UISettings.getInstance().getFolderBrowserFilesSortOrder()) {
             case SortManager.SortFiles.DEFAULT:
                 menu.findItem(R.id.sort_files_default).setChecked(true);
                 break;
@@ -315,7 +315,7 @@ public class FolderFragment extends BaseFragment implements
                 break;
         }
 
-        switch (SettingsManager.getInstance().getFolderBrowserFoldersSortOrder()) {
+        switch (UISettings.getInstance().getFolderBrowserFoldersSortOrder()) {
             case SortManager.SortFolders.DEFAULT:
                 menu.findItem(R.id.sort_folder_default).setChecked(true);
                 break;
@@ -326,9 +326,9 @@ public class FolderFragment extends BaseFragment implements
 
         menu.findItem(R.id.folder_home_dir).setIcon(fileBrowser.getHomeDirIcon());
         menu.findItem(R.id.folder_home_dir).setTitle(fileBrowser.getHomeDirTitle());
-        menu.findItem(R.id.show_filenames).setChecked(SettingsManager.getInstance().getFolderBrowserShowFileNames());
-        menu.findItem(R.id.files_ascending).setChecked(SettingsManager.getInstance().getFolderBrowserFilesAscending());
-        menu.findItem(R.id.folders_ascending).setChecked(SettingsManager.getInstance().getFolderBrowserFoldersAscending());
+        menu.findItem(R.id.show_filenames).setChecked(UISettings.getInstance().getFolderBrowserShowFileNames());
+        menu.findItem(R.id.files_ascending).setChecked(UISettings.getInstance().getFolderBrowserFilesAscending());
+        menu.findItem(R.id.folders_ascending).setChecked(UISettings.getInstance().getFolderBrowserFoldersAscending());
     }
 
     @Override
@@ -575,52 +575,52 @@ public class FolderFragment extends BaseFragment implements
                 }
                 return true;
             case R.id.sort_files_default:
-                SettingsManager.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.DEFAULT);
+                UISettings.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.DEFAULT);
                 reload();
                 updateMenuItems();
                 return true;
             case R.id.sort_files_filename:
-                SettingsManager.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.FILE_NAME);
+                UISettings.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.FILE_NAME);
                 reload();
                 updateMenuItems();
                 return true;
             case R.id.sort_files_size:
-                SettingsManager.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.SIZE);
+                UISettings.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.SIZE);
                 reload();
                 updateMenuItems();
                 return true;
             case R.id.sort_files_artist_name:
-                SettingsManager.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.ARTIST_NAME);
+                UISettings.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.ARTIST_NAME);
                 reload();
                 updateMenuItems();
                 return true;
             case R.id.sort_files_album_name:
-                SettingsManager.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.ALBUM_NAME);
+                UISettings.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.ALBUM_NAME);
                 reload();
                 updateMenuItems();
                 return true;
             case R.id.sort_files_track_name:
-                SettingsManager.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.TRACK_NAME);
+                UISettings.getInstance().setFolderBrowserFilesSortOrder(SortManager.SortFiles.TRACK_NAME);
                 reload();
                 updateMenuItems();
                 return true;
             case R.id.files_ascending:
-                SettingsManager.getInstance().setFolderBrowserFilesAscending(!menuItem.isChecked());
+                UISettings.getInstance().setFolderBrowserFilesAscending(!menuItem.isChecked());
                 reload();
                 updateMenuItems();
                 return true;
             case R.id.sort_folder_count:
-                SettingsManager.getInstance().setFolderBrowserFoldersSortOrder(SortManager.SortFolders.COUNT);
+                UISettings.getInstance().setFolderBrowserFoldersSortOrder(SortManager.SortFolders.COUNT);
                 reload();
                 updateMenuItems();
                 return true;
             case R.id.sort_folder_default:
-                SettingsManager.getInstance().setFolderBrowserFoldersSortOrder(SortManager.SortFolders.DEFAULT);
+                UISettings.getInstance().setFolderBrowserFoldersSortOrder(SortManager.SortFolders.DEFAULT);
                 reload();
                 updateMenuItems();
                 return true;
             case R.id.folders_ascending:
-                SettingsManager.getInstance().setFolderBrowserFoldersAscending(!menuItem.isChecked());
+                UISettings.getInstance().setFolderBrowserFoldersAscending(!menuItem.isChecked());
                 reload();
                 getActivity().invalidateOptionsMenu();
                 return true;
@@ -633,7 +633,7 @@ public class FolderFragment extends BaseFragment implements
                 showBlacklist(true);
                 return true;
             case R.id.show_filenames:
-                SettingsManager.getInstance().setFolderBrowserShowFileNames(!menuItem.isChecked());
+                UISettings.getInstance().setFolderBrowserShowFileNames(!menuItem.isChecked());
                 adapter.notifyItemRangeChanged(0, adapter.getItemCount(), 0);
                 updateMenuItems();
                 return true;

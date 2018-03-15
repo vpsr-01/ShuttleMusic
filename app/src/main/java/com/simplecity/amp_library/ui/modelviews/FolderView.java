@@ -21,7 +21,7 @@ import com.simplecity.amp_library.model.InclExclItem;
 import com.simplecity.amp_library.sql.databases.InclExclHelper;
 import com.simplecity.amp_library.ui.adapters.ViewType;
 import com.simplecity.amp_library.ui.views.CircleImageView;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecity.amp_library.utils.StringUtils;
 import com.simplecityapps.recycler_adapter.recyclerview.BaseViewHolder;
 
@@ -141,7 +141,7 @@ public class FolderView extends BaseSelectableViewModel<FolderView.ViewHolder> {
     public void bindView(ViewHolder holder) {
         super.bindView(holder);
 
-        if (baseFileObject instanceof FileObject && SettingsManager.getInstance().getFolderBrowserShowFileNames()) {
+        if (baseFileObject instanceof FileObject && UISettings.getInstance().getFolderBrowserShowFileNames()) {
             holder.lineFour.setText(String.format("%s.%s", ((FileObject) baseFileObject).name, ((FileObject) baseFileObject).extension));
             holder.lineFour.setVisibility(View.VISIBLE);
             holder.textContainer.setVisibility(View.GONE);
@@ -194,7 +194,7 @@ public class FolderView extends BaseSelectableViewModel<FolderView.ViewHolder> {
     public void bindView(ViewHolder holder, int position, List payloads) {
         super.bindView(holder, position, payloads);
 
-        if (baseFileObject instanceof FileObject && SettingsManager.getInstance().getFolderBrowserShowFileNames()) {
+        if (baseFileObject instanceof FileObject && UISettings.getInstance().getFolderBrowserShowFileNames()) {
             holder.lineFour.setText(String.format("%s.%s", ((FileObject) baseFileObject).name, ((FileObject) baseFileObject).extension));
             holder.lineFour.setVisibility(View.VISIBLE);
             holder.textContainer.setVisibility(View.GONE);

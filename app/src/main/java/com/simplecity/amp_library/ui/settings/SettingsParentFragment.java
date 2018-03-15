@@ -28,7 +28,7 @@ import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.dagger.module.ActivityModule;
 import com.simplecity.amp_library.ui.drawer.DrawerLockManager;
 import com.simplecity.amp_library.ui.drawer.MiniPlayerLockManager;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecity.amp_library.utils.ShuttleUtils;
 
 import javax.inject.Inject;
@@ -177,7 +177,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
 
             // Support Preferences
 
-            Preference changelogPreference = findPreference(SettingsManager.KEY_PREF_CHANGELOG);
+            Preference changelogPreference = findPreference(UISettings.KEY_PREF_CHANGELOG);
             if (changelogPreference != null) {
                 changelogPreference.setOnPreferenceClickListener(preference -> {
                     settingsPresenter.changelogClicked(getContext());
@@ -185,7 +185,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            Preference faqPreference = findPreference(SettingsManager.KEY_PREF_FAQ);
+            Preference faqPreference = findPreference(UISettings.KEY_PREF_FAQ);
             if (faqPreference != null) {
                 faqPreference.setOnPreferenceClickListener(preference -> {
                     supportPresenter.faqClicked();
@@ -193,7 +193,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            Preference helpPreference = findPreference(SettingsManager.KEY_PREF_HELP);
+            Preference helpPreference = findPreference(UISettings.KEY_PREF_HELP);
             if (helpPreference != null) {
                 helpPreference.setOnPreferenceClickListener(preference -> {
                     supportPresenter.helpClicked();
@@ -201,7 +201,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            Preference ratePreference = findPreference(SettingsManager.KEY_PREF_RATE);
+            Preference ratePreference = findPreference(UISettings.KEY_PREF_RATE);
             if (ratePreference != null) {
                 ratePreference.setOnPreferenceClickListener(preference -> {
                     supportPresenter.rateClicked();
@@ -209,7 +209,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            Preference restorePurchasesPreference = findPreference(SettingsManager.KEY_PREF_RESTORE_PURCHASES);
+            Preference restorePurchasesPreference = findPreference(UISettings.KEY_PREF_RESTORE_PURCHASES);
             if (restorePurchasesPreference != null) {
                 if (ShuttleUtils.isAmazonBuild() || ShuttleUtils.isUpgraded()) {
                     restorePurchasesPreference.setVisible(false);
@@ -222,7 +222,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
 
             // Display
 
-            Preference chooseTabsPreference = findPreference(SettingsManager.KEY_PREF_TAB_CHOOSER);
+            Preference chooseTabsPreference = findPreference(UISettings.KEY_PREF_TAB_CHOOSER);
             if (chooseTabsPreference != null) {
                 chooseTabsPreference.setOnPreferenceClickListener(preference -> {
                     settingsPresenter.chooseTabsClicked(getActivity());
@@ -230,7 +230,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            Preference defaultPagePreference = findPreference(SettingsManager.KEY_PREF_DEFAULT_PAGE);
+            Preference defaultPagePreference = findPreference(UISettings.KEY_PREF_DEFAULT_PAGE);
             if (defaultPagePreference != null) {
                 defaultPagePreference.setOnPreferenceClickListener(preference -> {
                     settingsPresenter.chooseDefaultPageClicked(getContext());
@@ -240,7 +240,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
 
             // Themes
 
-            Preference baseThemePreference = findPreference(SettingsManager.KEY_PREF_THEME_BASE);
+            Preference baseThemePreference = findPreference(UISettings.KEY_PREF_THEME_BASE);
             if (baseThemePreference != null) {
                 baseThemePreference.setOnPreferenceClickListener(preference -> {
                     settingsPresenter.baseThemeClicked(getContext());
@@ -248,7 +248,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            Preference primaryColorPreference = findPreference(SettingsManager.KEY_PREF_PRIMARY_COLOR);
+            Preference primaryColorPreference = findPreference(UISettings.KEY_PREF_PRIMARY_COLOR);
             if (primaryColorPreference != null) {
                 primaryColorPreference.setOnPreferenceClickListener(preference -> {
                     settingsPresenter.primaryColorClicked(getContext());
@@ -256,7 +256,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            Preference accentColorColorPreference = findPreference(SettingsManager.KEY_PREF_ACCENT_COLOR);
+            Preference accentColorColorPreference = findPreference(UISettings.KEY_PREF_ACCENT_COLOR);
             if (accentColorColorPreference != null) {
                 accentColorColorPreference.setOnPreferenceClickListener(preference -> {
                     settingsPresenter.accentColorClicked(getContext());
@@ -264,7 +264,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            SwitchPreferenceCompat tintNavBarColorPreference = (SwitchPreferenceCompat) findPreference(SettingsManager.KEY_PREF_NAV_BAR);
+            SwitchPreferenceCompat tintNavBarColorPreference = (SwitchPreferenceCompat) findPreference(UISettings.KEY_PREF_NAV_BAR);
             if (tintNavBarColorPreference != null) {
                 tintNavBarColorPreference.setOnPreferenceChangeListener((preference, newValue) -> {
                     settingsPresenter.tintNavBarClicked(getContext(), (Boolean) newValue);
@@ -272,7 +272,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            SwitchPreferenceCompat usePalettePreference = (SwitchPreferenceCompat) findPreference(SettingsManager.KEY_PREF_PALETTE);
+            SwitchPreferenceCompat usePalettePreference = (SwitchPreferenceCompat) findPreference(UISettings.KEY_PREF_PALETTE);
             if (usePalettePreference != null) {
                 usePalettePreference.setOnPreferenceChangeListener((preference, newValue) -> {
                     settingsPresenter.usePaletteClicked(getContext(), (Boolean) newValue);
@@ -280,7 +280,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            SwitchPreferenceCompat usePaletteNowPlayingOnlyPreference = (SwitchPreferenceCompat) findPreference(SettingsManager.KEY_PREF_PALETTE_NOW_PLAYING_ONLY);
+            SwitchPreferenceCompat usePaletteNowPlayingOnlyPreference = (SwitchPreferenceCompat) findPreference(UISettings.KEY_PREF_PALETTE_NOW_PLAYING_ONLY);
             if (usePaletteNowPlayingOnlyPreference != null) {
                 usePaletteNowPlayingOnlyPreference.setOnPreferenceChangeListener((preference, newValue) -> {
                     settingsPresenter.usePaletteNowPlayingOnlyClicked(getContext(), (Boolean) newValue);
@@ -290,7 +290,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
 
             // Artwork
 
-            Preference downloadArtworkPreference = findPreference(SettingsManager.KEY_PREF_DOWNLOAD_ARTWORK);
+            Preference downloadArtworkPreference = findPreference(UISettings.KEY_PREF_DOWNLOAD_ARTWORK);
             if (downloadArtworkPreference != null) {
                 downloadArtworkPreference.setOnPreferenceClickListener(preference -> {
                     settingsPresenter.downloadArtworkClicked(getContext());
@@ -298,7 +298,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            Preference deleteArtworkPreference = findPreference(SettingsManager.KEY_PREF_DELETE_ARTWORK);
+            Preference deleteArtworkPreference = findPreference(UISettings.KEY_PREF_DELETE_ARTWORK);
             if (deleteArtworkPreference != null) {
                 deleteArtworkPreference.setOnPreferenceClickListener(preference -> {
                     settingsPresenter.deleteArtworkClicked(getContext());
@@ -306,7 +306,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            SwitchPreferenceCompat ignoreEmbeddedArtworkPreference = (SwitchPreferenceCompat) findPreference(SettingsManager.KEY_IGNORE_EMBEDDED_ARTWORK);
+            SwitchPreferenceCompat ignoreEmbeddedArtworkPreference = (SwitchPreferenceCompat) findPreference(UISettings.KEY_IGNORE_EMBEDDED_ARTWORK);
             if (ignoreEmbeddedArtworkPreference != null) {
                 ignoreEmbeddedArtworkPreference.setOnPreferenceChangeListener((preference, newValue) -> {
                     settingsPresenter.changeArtworkPreferenceClicked(getContext());
@@ -314,7 +314,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            SwitchPreferenceCompat ignoreFolderArtworkPreference = (SwitchPreferenceCompat) findPreference(SettingsManager.KEY_IGNORE_FOLDER_ARTWORK);
+            SwitchPreferenceCompat ignoreFolderArtworkPreference = (SwitchPreferenceCompat) findPreference(UISettings.KEY_IGNORE_FOLDER_ARTWORK);
             if (ignoreFolderArtworkPreference != null) {
                 ignoreFolderArtworkPreference.setOnPreferenceChangeListener((preference, newValue) -> {
                     settingsPresenter.changeArtworkPreferenceClicked(getContext());
@@ -322,7 +322,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            SwitchPreferenceCompat preferEmbeddedArtworkPreference = (SwitchPreferenceCompat) findPreference(SettingsManager.KEY_PREFER_EMBEDDED_ARTWORK);
+            SwitchPreferenceCompat preferEmbeddedArtworkPreference = (SwitchPreferenceCompat) findPreference(UISettings.KEY_PREFER_EMBEDDED_ARTWORK);
             if (preferEmbeddedArtworkPreference != null) {
                 preferEmbeddedArtworkPreference.setOnPreferenceChangeListener((preference, newValue) -> {
                     settingsPresenter.changeArtworkPreferenceClicked(getContext());
@@ -330,7 +330,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            SwitchPreferenceCompat ignoreMediaStoreArtworkPreference = (SwitchPreferenceCompat) findPreference(SettingsManager.KEY_IGNORE_MEDIASTORE_ART);
+            SwitchPreferenceCompat ignoreMediaStoreArtworkPreference = (SwitchPreferenceCompat) findPreference(UISettings.KEY_IGNORE_MEDIASTORE_ART);
             if (ignoreMediaStoreArtworkPreference != null) {
                 ignoreMediaStoreArtworkPreference.setOnPreferenceChangeListener((preference, newValue) -> {
                     settingsPresenter.changeArtworkPreferenceClicked(getContext());
@@ -338,7 +338,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            SwitchPreferenceCompat preferLastFmArtworkPreference = (SwitchPreferenceCompat) findPreference(SettingsManager.KEY_PREFER_LAST_FM);
+            SwitchPreferenceCompat preferLastFmArtworkPreference = (SwitchPreferenceCompat) findPreference(UISettings.KEY_PREFER_LAST_FM);
             if (preferLastFmArtworkPreference != null) {
                 preferLastFmArtworkPreference.setOnPreferenceChangeListener((preference, newValue) -> {
                     settingsPresenter.changeArtworkPreferenceClicked(getContext());
@@ -350,7 +350,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
 
             // Scrobbling
 
-            Preference downloadScrobblerPreference = findPreference(SettingsManager.KEY_PREF_DOWNLOAD_SCROBBLER);
+            Preference downloadScrobblerPreference = findPreference(UISettings.KEY_PREF_DOWNLOAD_SCROBBLER);
             if (downloadScrobblerPreference != null) {
                 if (ShuttleUtils.isAmazonBuild()) {
                     // Amazon don't allow links to the Play Store
@@ -364,7 +364,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
 
             // Whitelist/Blacklist
 
-            Preference viewBlacklistPreference = findPreference(SettingsManager.KEY_PREF_BLACKLIST);
+            Preference viewBlacklistPreference = findPreference(UISettings.KEY_PREF_BLACKLIST);
             if (viewBlacklistPreference != null) {
                 viewBlacklistPreference.setOnPreferenceClickListener(preference -> {
                     settingsPresenter.viewBlacklistClicked(getContext());
@@ -372,7 +372,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
                 });
             }
 
-            Preference viewWhitelistPreference = findPreference(SettingsManager.KEY_PREF_WHITELIST);
+            Preference viewWhitelistPreference = findPreference(UISettings.KEY_PREF_WHITELIST);
             if (viewWhitelistPreference != null) {
                 viewWhitelistPreference.setOnPreferenceClickListener(preference -> {
                     settingsPresenter.viewWhitelistClicked(getContext());
@@ -381,7 +381,7 @@ public class SettingsParentFragment extends BaseNavigationController implements
             }
 
             // Upgrade preference
-            Preference upgradePreference = findPreference(SettingsManager.KEY_PREF_UPGRADE);
+            Preference upgradePreference = findPreference(UISettings.KEY_PREF_UPGRADE);
             if (upgradePreference != null) {
                 if (ShuttleUtils.isUpgraded()) {
                     upgradePreference.setVisible(false);

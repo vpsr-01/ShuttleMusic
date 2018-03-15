@@ -1,4 +1,4 @@
-package com.simplecity.amp_library.notifications;
+package com.simplecity.amp_library.playback.old;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -24,7 +24,7 @@ import com.simplecity.amp_library.BuildConfig;
 import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.glide.utils.GlideUtils;
 import com.simplecity.amp_library.model.Song;
-import com.simplecity.amp_library.playback.MusicService;
+import com.simplecity.amp_library.notifications.NotificationHelper;
 import com.simplecity.amp_library.utils.LogUtils;
 import com.simplecity.amp_library.utils.PlaceholderProvider;
 import com.simplecity.amp_library.utils.PlaylistUtils;
@@ -70,34 +70,33 @@ public class MusicNotificationHelper extends NotificationHelper {
                 .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
                         .setShowActionsInCompactView(0, 1, 2)
                         .setMediaSession(mediaSessionCompat.getSessionToken()))
-                .addAction(
-                        R.drawable.ic_skip_previous_24dp,
-                        context.getString(R.string.btn_prev),
-                        MusicService.retrievePlaybackAction(context, MusicService.ServiceCommand.PREV_ACTION)
-                )
-                .addAction(
-                        isPlaying ? R.drawable.ic_pause_24dp : R.drawable.ic_play_24dp,
-                        context.getString(isPlaying ? R.string.btn_pause : R.string.btn_play),
-                        MusicService.retrievePlaybackAction(context, MusicService.ServiceCommand.TOGGLE_PAUSE_ACTION)
-                )
-                .addAction(
-                        R.drawable.ic_skip_next_24dp,
-                        context.getString(R.string.btn_skip),
-                        MusicService.retrievePlaybackAction(context, MusicService.ServiceCommand.NEXT_ACTION)
-                )
-                .addAction(
-                        isFavorite ? R.drawable.ic_favorite_24dp_scaled : R.drawable.ic_favorite_border_24dp_scaled,
-                        context.getString(R.string.fav_add),
-                        MusicService.retrievePlaybackAction(context, MusicService.ServiceCommand.TOGGLE_FAVORITE)
-                )
+
                 .setShowWhen(false)
                 .setVisibility(android.support.v4.app.NotificationCompat.VISIBILITY_PUBLIC);
+
+        addActions(context, builder);
 
         if (bitmap != null) {
             builder.setLargeIcon(bitmap);
         }
 
         return builder;
+    }
+
+    void addActions(Context context, NotificationCompat.Builder builder) {
+//        builder
+//                .addAction(R.drawable.ic_skip_previous_24dp,
+//                        context.getString(R.string.btn_prev),
+//                        MusicService.retrievePlaybackAction(context, Constants.ServiceCommand.PREV_ACTION))
+//                .addAction(isPlaying ? R.drawable.ic_pause_24dp : R.drawable.ic_play_24dp,
+//                        context.getString(isPlaying ? R.string.btn_pause : R.string.btn_play),
+//                        MusicService.retrievePlaybackAction(context, Constants.ServiceCommand.TOGGLE_PAUSE_ACTION))
+//                .addAction(R.drawable.ic_skip_next_24dp,
+//                        context.getString(R.string.btn_skip),
+//                        MusicService.retrievePlaybackAction(context, Constants.ServiceCommand.NEXT_ACTION))
+//                .addAction(isFavorite ? R.drawable.ic_favorite_24dp_scaled : R.drawable.ic_favorite_border_24dp_scaled,
+//                        context.getString(R.string.fav_add),
+//                        MusicService.retrievePlaybackAction(context, Constants.ServiceCommand.TOGGLE_FAVORITE))
     }
 
     @SuppressLint("CheckResult")

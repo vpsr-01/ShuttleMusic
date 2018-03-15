@@ -25,6 +25,7 @@ import com.afollestad.aesthetic.Aesthetic;
 import com.afollestad.aesthetic.ViewBackgroundAction;
 import com.annimon.stream.Stream;
 import com.cantrowitz.rxbroadcast.RxBroadcast;
+import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.model.Album;
@@ -32,6 +33,7 @@ import com.simplecity.amp_library.model.AlbumArtist;
 import com.simplecity.amp_library.model.CategoryItem;
 import com.simplecity.amp_library.model.Genre;
 import com.simplecity.amp_library.model.Playlist;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.search.SearchFragment;
 import com.simplecity.amp_library.ui.activities.ToolbarListener;
 import com.simplecity.amp_library.ui.adapters.PagerAdapter;
@@ -45,8 +47,7 @@ import com.simplecity.amp_library.ui.views.ContextualToolbar;
 import com.simplecity.amp_library.ui.views.ContextualToolbarHost;
 import com.simplecity.amp_library.ui.views.multisheet.MultiSheetEventRelay;
 import com.simplecity.amp_library.utils.DialogUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecity.multisheetview.ui.view.MultiSheetView;
 
 import java.util.ArrayList;
@@ -92,8 +93,7 @@ public class LibraryController extends BaseFragment implements
     @BindView(R.id.app_bar)
     AppBarLayout appBarLayout;
 
-    @Inject
-    NavigationEventRelay navigationEventRelay;
+    @Inject NavigationEventRelay navigationEventRelay;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -189,7 +189,8 @@ public class LibraryController extends BaseFragment implements
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.menu_library, menu);
-        setupCastMenu(menu);
+
+        CastButtonFactory.setUpMediaRouteButton(getContext().getApplicationContext(), menu, R.id.media_route_menu_item);
     }
 
     @Override
@@ -219,7 +220,7 @@ public class LibraryController extends BaseFragment implements
                 .filter(categoryItem -> categoryItem.isChecked)
                 .toList();
 
-        int defaultPageType = SettingsManager.getInstance().getDefaultPageType();
+        int defaultPageType = UISettings.getInstance().getDefaultPageType();
         for (int i = 0; i < categoryItems.size(); i++) {
             CategoryItem categoryItem = categoryItems.get(i);
             pagerAdapter.addFragment(categoryItem.getFragment(getContext()));

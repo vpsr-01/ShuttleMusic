@@ -1,5 +1,6 @@
 package com.simplecity.amp_library.ui.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
@@ -21,7 +22,7 @@ import com.simplecity.amp_library.glide.preloader.RecyclerViewPreloader;
 import com.simplecity.amp_library.ui.modelviews.QueuePagerItemView;
 import com.simplecity.amp_library.ui.presenters.QueuePagerPresenter;
 import com.simplecity.amp_library.ui.views.QueuePagerView;
-import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.utils.PlaceholderProvider;
 import com.simplecity.amp_library.utils.ShuttleUtils;
 import com.simplecityapps.recycler_adapter.adapter.ViewModelAdapter;
@@ -36,8 +37,8 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class QueuePagerFragment extends BaseFragment implements
         RequestManagerProvider,
@@ -100,21 +101,23 @@ public class QueuePagerFragment extends BaseFragment implements
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(viewModelAdapter);
         SnapHelper snapHelper = new PagerSnapHelper() {
+            @SuppressLint("CheckResult")
             @Override
             public int findTargetSnapPosition(RecyclerView.LayoutManager layoutManager, int velocityX, int velocityY) {
 
                 int snapPosition = super.findTargetSnapPosition(layoutManager, velocityX, velocityY);
 
                 if (snapPosition < viewModelAdapter.items.size()) {
-                    Observable.defer(() -> {
-                        if (MusicUtils.getQueuePosition() != snapPosition) {
-                            MusicUtils.setQueuePosition(snapPosition);
-                        }
-                        return Observable.empty();
-                    })
-                            .delaySubscription(150, TimeUnit.MILLISECONDS)
-                            .subscribeOn(Schedulers.io())
-                            .subscribe();
+                    if (MusicUtils.getQueuePosition() != snapPosition) {
+                        Completable.timer(200, TimeUnit.MILLISECONDS)
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(() -> {
+                                    queuePagerPresenter.ignoreQueueChangeEvent = true;
+                                    if (MusicUtils.getQueuePosition() != snapPosition) {
+                                        MusicUtils.setQueuePosition(snapPosition);
+                                    }
+                                });
+                    }
                 }
 
                 return snapPosition;

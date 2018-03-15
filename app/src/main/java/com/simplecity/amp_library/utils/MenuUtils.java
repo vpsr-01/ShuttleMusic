@@ -24,6 +24,7 @@ import com.simplecity.amp_library.model.Genre;
 import com.simplecity.amp_library.model.InclExclItem;
 import com.simplecity.amp_library.model.Playlist;
 import com.simplecity.amp_library.model.Song;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.rx.UnsafeAction;
 import com.simplecity.amp_library.rx.UnsafeCallable;
 import com.simplecity.amp_library.rx.UnsafeConsumer;
@@ -44,9 +45,12 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class MenuUtils implements MusicUtils.Defs {
+public class MenuUtils {
 
     private static final String TAG = "MenuUtils";
+
+    public static final int PLAYLIST_SELECTED = 1;
+    public static final int NEW_PLAYLIST = 2;
 
     // Songs
 
@@ -769,6 +773,11 @@ public class MenuUtils implements MusicUtils.Defs {
                 });
         builder.negativeText(R.string.cancel)
                 .show();
+    }
+
+    public static void setInitialDir(Context context, FolderObject folderObject) {
+        UISettings.getInstance().setFolderBrowserInitialDir(folderObject.path);
+        Toast.makeText(context, folderObject.path + context.getResources().getString(R.string.initial_dir_set_message), Toast.LENGTH_SHORT).show();
     }
 
     @Nullable

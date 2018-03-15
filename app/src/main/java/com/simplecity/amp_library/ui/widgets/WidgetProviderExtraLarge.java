@@ -94,9 +94,9 @@ public class WidgetProviderExtraLarge extends BaseWidgetProvider {
             final Resources res = service.getResources();
             final RemoteViews views = new RemoteViews(service.getPackageName(), mLayoutId);
 
-            CharSequence titleName = service.getSongName();
-            CharSequence albumName = service.getAlbumName();
-            CharSequence artistName = service.getAlbumArtistName();
+            CharSequence titleName = service.getCurrentSong().name;
+            CharSequence albumName = service.getCurrentSong().albumName;
+            CharSequence artistName = service.getCurrentSong().albumArtistName;
             CharSequence errorState = null;
 
             // Format title string with track number, or show SD card message

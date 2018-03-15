@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import com.simplecity.amp_library.BuildConfig;
 import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.ui.presenters.Presenter;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 import com.simplecity.amp_library.utils.ShuttleUtils;
 
 import javax.inject.Inject;
@@ -52,7 +52,7 @@ public class SupportPresenter extends Presenter<SupportView> {
 
     public void rateClicked() {
 
-        SettingsManager.getInstance().setHasRated();
+        UISettings.getInstance().setHasRated();
 
         SupportView supportView = getView();
         if (supportView != null) {

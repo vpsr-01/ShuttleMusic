@@ -1,7 +1,6 @@
 package com.simplecity.amp_library.playback;
 
 import com.simplecity.amp_library.utils.MusicServiceConnectionUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
 
 import java.util.concurrent.TimeUnit;
 

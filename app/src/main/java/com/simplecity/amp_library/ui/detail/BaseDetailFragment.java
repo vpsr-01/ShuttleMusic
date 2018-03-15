@@ -59,7 +59,7 @@ import com.simplecity.amp_library.utils.ActionBarUtils;
 import com.simplecity.amp_library.utils.ContextualToolbarHelper;
 import com.simplecity.amp_library.utils.LogUtils;
 import com.simplecity.amp_library.utils.MenuUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.utils.Operators;
 import com.simplecity.amp_library.utils.PlaceholderProvider;
 import com.simplecity.amp_library.utils.PlaylistUtils;
@@ -68,6 +68,7 @@ import com.simplecity.amp_library.utils.ShuttleUtils;
 import com.simplecity.amp_library.utils.SortManager;
 import com.simplecity.amp_library.utils.StringUtils;
 import com.simplecity.amp_library.utils.TypefaceManager;
+import com.simplecity.amp_library.utils.VersionUtils;
 import com.simplecityapps.recycler_adapter.adapter.CompletionListUpdateCallbackAdapter;
 import com.simplecityapps.recycler_adapter.adapter.ViewModelAdapter;
 import com.simplecityapps.recycler_adapter.model.ViewModel;
@@ -132,8 +133,8 @@ public abstract class BaseDetailFragment extends BaseFragment implements
     @BindView(R.id.contextualToolbar)
     ContextualToolbar contextualToolbar;
 
-    ColorStateList collapsingToolbarTextColor;
-    ColorStateList collapsingToolbarSubTextColor;
+    private ColorStateList collapsingToolbarTextColor;
+    private ColorStateList collapsingToolbarSubTextColor;
 
     protected CompositeDisposable disposables = new CompositeDisposable();
 
@@ -149,7 +150,7 @@ public abstract class BaseDetailFragment extends BaseFragment implements
 
     protected ViewModelAdapter adapter;
 
-    HorizontalRecyclerView horizontalRecyclerView;
+    private HorizontalRecyclerView horizontalRecyclerView;
 
     @Nullable
     Album currentSlideShowAlbum;
@@ -507,8 +508,6 @@ public abstract class BaseDetailFragment extends BaseFragment implements
     protected void setupToolbarMenu(Toolbar toolbar) {
         toolbar.inflateMenu(R.menu.menu_detail_sort);
 
-        setupCastMenu(toolbar.getMenu());
-
         toolbar.setOnMenuItemClickListener(this);
 
         // Create playlist menu
@@ -597,14 +596,14 @@ public abstract class BaseDetailFragment extends BaseFragment implements
             case R.id.addToQueue:
                 detailPresenter.addToQueue();
                 return true;
-            case MusicUtils.Defs.NEW_PLAYLIST:
+            case MenuUtils.NEW_PLAYLIST:
                 detailPresenter.newPlaylist(getContext(), () -> {
                     if (getContext() != null) {
                         contextualToolbarHelper.finish();
                     }
                 });
                 return true;
-            case MusicUtils.Defs.PLAYLIST_SELECTED:
+            case MenuUtils.PLAYLIST_SELECTED:
                 detailPresenter.playlistSelected(getContext(), item, () -> {
                     if (getContext() != null) {
                         contextualToolbarHelper.finish();

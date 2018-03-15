@@ -20,6 +20,7 @@ import com.jakewharton.rxbinding2.widget.SeekBarStartChangeEvent;
 import com.jakewharton.rxbinding2.widget.SeekBarStopChangeEvent;
 import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.ShuttleApplication;
+import com.simplecity.amp_library.playback.QueueManager;
 import com.simplecity.amp_library.ui.presenters.PlayerPresenter;
 import com.simplecity.amp_library.utils.LogUtils;
 import com.simplecity.amp_library.utils.ShuttleUtils;
@@ -238,14 +239,14 @@ public class UpNextView extends LinearLayout {
         }
 
         @Override
-        public void shuffleChanged(int shuffleMode) {
+        public void shuffleChanged(@QueueManager.ShuffleMode String shuffleMode) {
             if (shuffleButton != null) {
                 shuffleButton.setShuffleMode(shuffleMode);
             }
         }
 
         @Override
-        public void repeatChanged(int repeatMode) {
+        public void repeatChanged(@QueueManager.RepeatMode String repeatMode) {
             if (repeatButton != null) {
                 repeatButton.setRepeatMode(repeatMode);
             }

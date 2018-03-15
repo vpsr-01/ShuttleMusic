@@ -38,7 +38,7 @@ import com.simplecity.amp_library.ui.views.multisheet.MultiSheetSlideEventRelay;
 import com.simplecity.amp_library.utils.ContextualToolbarHelper;
 import com.simplecity.amp_library.utils.ContextualToolbarHelper.Callback;
 import com.simplecity.amp_library.utils.MenuUtils;
-import com.simplecity.amp_library.utils.MusicUtils;
+import com.simplecity.amp_library.playback.MusicUtils;
 import com.simplecity.amp_library.utils.PermissionUtils;
 import com.simplecity.amp_library.utils.PlaylistUtils;
 import com.simplecity.amp_library.utils.ResourceUtils;
@@ -66,6 +66,8 @@ public class QueueFragment extends BaseFragment implements QueueView {
     private static final String TAG = "QueueFragment";
 
     private final CompositeDisposable disposables = new CompositeDisposable();
+
+    private final int ADD_TO_PLAYLIST = 0;
 
     @BindView(R.id.statusBarView)
     ThemedStatusBarView statusBarView;
@@ -133,7 +135,7 @@ public class QueueFragment extends BaseFragment implements QueueView {
         toolbar.setNavigationOnClickListener(v -> getActivity().onBackPressed());
         toolbar.inflateMenu(R.menu.menu_queue);
 
-        SubMenu sub = toolbar.getMenu().addSubMenu(0, MusicUtils.Defs.ADD_TO_PLAYLIST, 1, R.string.save_as_playlist);
+        SubMenu sub = toolbar.getMenu().addSubMenu(0, ADD_TO_PLAYLIST, 1, R.string.save_as_playlist);
         disposables.add(PlaylistUtils.createUpdatingPlaylistMenu(sub).subscribe());
 
         toolbar.setOnMenuItemClickListener(toolbarListener);
@@ -345,15 +347,14 @@ public class QueueFragment extends BaseFragment implements QueueView {
                 case R.id.menu_clear:
                     queuePresenter.clearQueue();
                     return true;
-                case MusicUtils.Defs.NEW_PLAYLIST:
+                case MenuUtils.NEW_PLAYLIST:
                     queuePresenter.saveQueue(getContext());
                     return true;
-                case MusicUtils.Defs.PLAYLIST_SELECTED:
+                case MenuUtils.PLAYLIST_SELECTED:
                     queuePresenter.saveQueue(getContext(), item);
                     return true;
             }
             return false;
         }
     };
-
 }

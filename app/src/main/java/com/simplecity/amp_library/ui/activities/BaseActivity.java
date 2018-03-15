@@ -23,10 +23,10 @@ import com.simplecity.amp_library.R;
 import com.simplecity.amp_library.ShuttleApplication;
 import com.simplecity.amp_library.billing.BillingManager;
 import com.simplecity.amp_library.constants.Config;
-import com.simplecity.amp_library.playback.MusicService;
+import com.simplecity.amp_library.playback.old.Constants;
 import com.simplecity.amp_library.ui.dialog.UpgradeDialog;
 import com.simplecity.amp_library.utils.MusicServiceConnectionUtils;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 
 import java.util.List;
 
@@ -88,11 +88,12 @@ public abstract class BaseActivity extends AestheticActivity implements ServiceC
         });
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
     }
 
     @Override
     protected void onResume() {
-        keepScreenOn(SettingsManager.getInstance().keepScreenOn());
+        keepScreenOn(UISettings.getInstance().keepScreenOn());
         super.onResume();
 
         if (token == null) {
@@ -142,7 +143,7 @@ public abstract class BaseActivity extends AestheticActivity implements ServiceC
     @Override
     @CallSuper
     public void onServiceConnected(ComponentName name, IBinder service) {
-        sendBroadcast(new Intent(MusicService.InternalIntents.SERVICE_CONNECTED));
+        sendBroadcast(new Intent(Constants.InternalIntents.SERVICE_CONNECTED));
     }
 
     @Override

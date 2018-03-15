@@ -68,7 +68,7 @@ public class PlaceholderProvider {
 
     public Drawable getPlaceHolderDrawable(@Nullable String displayName, boolean large) {
         Drawable drawable;
-        if (!TextUtils.isEmpty(displayName) && SettingsManager.getInstance().useGmailPlaceholders()) {
+        if (!TextUtils.isEmpty(displayName) && UISettings.getInstance().useGmailPlaceholders()) {
             drawable = PlaceholderProvider.getInstance().getLetterTile(displayName);
         } else {
             drawable = ContextCompat.getDrawable(ShuttleApplication.getInstance(), large ? getLargePlaceHolderResId() : getMediumPlaceHolderResId());

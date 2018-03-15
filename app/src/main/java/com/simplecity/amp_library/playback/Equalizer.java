@@ -1,4 +1,4 @@
-package com.simplecity.amp_library.services;
+package com.simplecity.amp_library.playback;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,7 +13,7 @@ import android.util.Log;
 
 import com.annimon.stream.Stream;
 import com.crashlytics.android.Crashlytics;
-import com.simplecity.amp_library.utils.SettingsManager;
+import com.simplecity.amp_library.utils.UISettings;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -308,7 +308,7 @@ public class Equalizer {
     }
 
     private void updateDsp(EffectSet session) {
-        final boolean globalEnabled = SettingsManager.getInstance().getEqualizerEnabled();
+        final boolean globalEnabled = UISettings.getInstance().getEqualizerEnabled();
 
         try {
             session.enableBassBoost(globalEnabled && mPrefs.getBoolean("audiofx.bass.enable", false));

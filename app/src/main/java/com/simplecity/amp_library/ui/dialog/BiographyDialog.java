@@ -20,7 +20,7 @@ import com.simplecity.amp_library.model.Song;
 import com.simplecity.amp_library.utils.DialogUtils;
 import com.simplecity.amp_library.utils.FileHelper;
 import com.simplecity.amp_library.utils.LogUtils;
-import com.simplecity.amp_library.utils.ShuttleUtils;
+import com.simplecity.amp_library.utils.VersionUtils;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -67,7 +67,7 @@ public class BiographyDialog {
                 if (response != null && response.isSuccessful()) {
                     if (response.body() != null && response.body().artist != null && response.body().artist.bio != null) {
                         String summary = response.body().artist.bio.summary;
-                        if (ShuttleUtils.hasNougat()) {
+                        if (VersionUtils.hasNougat()) {
                             message.setText(Html.fromHtml(summary, Html.FROM_HTML_MODE_COMPACT));
                         } else {
                             message.setText(Html.fromHtml(summary));
@@ -99,7 +99,7 @@ public class BiographyDialog {
                 if (response != null && response.isSuccessful()) {
                     if (response.body() != null && response.body().album != null && response.body().album.wiki != null) {
                         String summary = response.body().album.wiki.summary;
-                        if (ShuttleUtils.hasNougat()) {
+                        if (VersionUtils.hasNougat()) {
                             message.setText(Html.fromHtml(summary, Html.FROM_HTML_MODE_COMPACT));
                         } else {
                             message.setText(Html.fromHtml(summary));
