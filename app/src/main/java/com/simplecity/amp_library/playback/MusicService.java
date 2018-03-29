@@ -40,12 +40,13 @@ public class MusicService extends Service {
     // indicates that the music playback should be paused (see {@link #onStartCommand})
     public static final String CMD_PAUSE = "CMD_PAUSE";
 
-    private final IBinder mBinder = new LocalBinder(this);
+    private final IBinder binder = new LocalBinder(this);
 
     private PlaybackManager playbackManager;
 
     private Equalizer equalizer;
 
+    @Nullable
     private MediaSessionCompat mediaSession;
 
     private MusicNotificationManager musicNotificationManager;
@@ -53,8 +54,8 @@ public class MusicService extends Service {
     @SuppressLint("CheckResult")
     @Override
     public void onCreate() {
-        Timber.d("onCreate() called");
         super.onCreate();
+        Timber.d("onCreate() called");
 
         QueueManager queueManager = new QueueManager(this, metadataUpdateListener);
 
@@ -95,7 +96,7 @@ public class MusicService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Timber.d("onBind() called");
-        return mBinder;
+        return binder;
     }
 
     @Override
@@ -119,7 +120,9 @@ public class MusicService extends Service {
 
         musicNotificationManager.stopNotification();
 
-        mediaSession.release();
+        if (mediaSession != null) {
+            mediaSession.release();
+        }
 
         super.onDestroy();
     }
@@ -280,14 +283,18 @@ public class MusicService extends Service {
         @Override
         public void onPlaybackStart() {
             Timber.d("onPlaybackStart()");
-            mediaSession.setActive(true);
+            if (mediaSession != null) {
+                mediaSession.setActive(true);
+            }
             MusicEventRelay.getInstance().sendEvent(new PlayStateChangedEvent(true));
         }
 
         @Override
         public void onPlaybackStop() {
             Timber.d("onPlaybackStop()");
-            mediaSession.setActive(false);
+            if (mediaSession != null) {
+                mediaSession.setActive(false);
+            }
             stopForeground(true);
             MusicEventRelay.getInstance().sendEvent(new PlayStateChangedEvent(false));
         }
@@ -295,7 +302,9 @@ public class MusicService extends Service {
         @Override
         public void onPlaybackStateUpdated(PlaybackStateCompat playbackStateCompat) {
             Timber.d("onPlaybackStateUpdated(), state: %d", playbackStateCompat.getState());
-            mediaSession.setPlaybackState(playbackStateCompat);
+            if (mediaSession != null) {
+                mediaSession.setPlaybackState(playbackStateCompat);
+            }
         }
 
         @Override

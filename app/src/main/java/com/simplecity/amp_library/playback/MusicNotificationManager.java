@@ -113,6 +113,7 @@ public class MusicNotificationManager extends BroadcastReceiver {
             // The notification must be updated after setting started to true
             Notification notification = createNotification();
             if (notification != null) {
+                started = true;
                 controller.registerCallback(mediaControllerCallback);
                 IntentFilter filter = new IntentFilter();
                 filter.addAction(Action.NEXT);
@@ -122,7 +123,6 @@ public class MusicNotificationManager extends BroadcastReceiver {
                 filter.addAction(Action.STOP_CASTING);
                 service.registerReceiver(this, filter);
                 service.startForeground(NOTIFICATION_ID, notification);
-                started = true;
             }
         }
     }
@@ -142,6 +142,7 @@ public class MusicNotificationManager extends BroadcastReceiver {
         }
     }
 
+    @Nullable
     public Notification createNotification() {
         Timber.d("updateNotificationMetadata() called. metadata: %s", metadata);
         if (metadata == null || playbackState == null) {
@@ -234,9 +235,11 @@ public class MusicNotificationManager extends BroadcastReceiver {
     }
 
     void setNotificationPlaybackState(NotificationCompat.Builder notificationBuilder) {
-        Timber.d("updateNotificationPlaybackState() called. mPlaybackState: %s", playbackState);
+        Timber.d("setNotificationPlaybackState() called. mPlaybackState: %s", playbackState);
         if (playbackState == null || !started) {
-            Timber.d("updateNotificationPlaybackState() called. cancelling notification!");
+            Timber.i("Playbackstate: " + playbackState + " started: " + started);
+            Timber.d("setNotificationPlaybackState() called. cancelling notification!");
+            Timber.i("stopForeground() removeNotification: true");
             service.stopForeground(true);
             return;
         }
@@ -300,8 +303,7 @@ public class MusicNotificationManager extends BroadcastReceiver {
         public void onPlaybackStateChanged(@NonNull PlaybackStateCompat state) {
             playbackState = state;
             Timber.d("Received new playback state: %s", state);
-            if (state.getState() == PlaybackStateCompat.STATE_STOPPED ||
-                    state.getState() == PlaybackStateCompat.STATE_NONE) {
+            if (state.getState() == PlaybackStateCompat.STATE_STOPPED || state.getState() == PlaybackStateCompat.STATE_NONE) {
                 stopNotification();
             } else {
                 Notification notification = createNotification();
